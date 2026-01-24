@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { getSession } from '@/lib/auth/session';
 import { openai, DEFAULT_MODEL, parseJsonResponse } from '@/lib/openai/client';
 import {
   HOOKS_SYSTEM_PROMPT,
   buildHooksUserPrompt,
-  extractHookTexts,
-  type HooksResponse,
   type HookStructured,
 } from '@/lib/openai/prompts/hooks';
 import { generateHooksSchema } from '@/lib/validations/schemas';
@@ -43,13 +41,12 @@ function parseHooksResponse(content: string): { hooks: string[]; hooksDetailed: 
 
 export async function POST(request: NextRequest) {
   try {
-    // Get authenticated user
-    const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    // Get session from cookie
+    const session = await getSession();
 
-    if (authError || !user) {
+    if (!session) {
       return NextResponse.json(
-        { error: 'Não autenticado', code: 'UNAUTHORIZED' },
+        { error: 'Nao autenticado', code: 'UNAUTHORIZED' },
         { status: 401 }
       );
     }
@@ -61,7 +58,7 @@ export async function POST(request: NextRequest) {
     if (!validation.success) {
       return NextResponse.json(
         {
-          error: validation.error.issues[0]?.message || 'Dados inválidos',
+          error: validation.error.issues[0]?.message || 'Dados invalidos',
           code: 'INVALID_INPUT'
         },
         { status: 400 }
@@ -70,23 +67,6 @@ export async function POST(request: NextRequest) {
 
     const { ideia, objetivo, tom } = validation.data;
 
-    // Check rate limit (10 hooks per hour)
-    const { data: rateLimit } = await supabase.rpc('get_rate_limit_count', {
-      p_user_id: user.id,
-      p_resource: 'hooks',
-    });
-
-    const hookLimit = parseInt(process.env.RATE_LIMIT_HOOKS_PER_HOUR || '10');
-    if (rateLimit && rateLimit >= hookLimit) {
-      return NextResponse.json(
-        {
-          error: `Limite de ${hookLimit} gerações por hora atingido. Tente novamente em breve.`,
-          code: 'RATE_LIMIT_EXCEEDED',
-        },
-        { status: 429 }
-      );
-    }
-
     // Generate hooks with OpenAI
     const completion = await openai.chat.completions.create({
       model: DEFAULT_MODEL,
@@ -94,7 +74,7 @@ export async function POST(request: NextRequest) {
         { role: 'system', content: HOOKS_SYSTEM_PROMPT },
         { role: 'user', content: buildHooksUserPrompt(ideia, objetivo, tom) },
       ],
-      max_tokens: 800, // Aumentado para suportar formato estruturado
+      max_tokens: 800,
       temperature: 0.8,
     });
 
@@ -106,7 +86,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Parse JSON response (suporta formato novo e antigo)
+    // Parse JSON response
     let hooks: string[];
     let hooksDetailed: HookStructured[];
     try {
@@ -124,21 +104,15 @@ export async function POST(request: NextRequest) {
     // Validate hooks array
     if (!Array.isArray(hooks) || hooks.length < 3) {
       return NextResponse.json(
-        { error: 'Resposta inválida da IA. Tente novamente.', code: 'INVALID_RESPONSE' },
+        { error: 'Resposta invalida da IA. Tente novamente.', code: 'INVALID_RESPONSE' },
         { status: 500 }
       );
     }
 
-    // Increment rate limit
-    await supabase.rpc('increment_rate_limit', {
-      p_user_id: user.id,
-      p_resource: 'hooks',
-    });
-
-    // Return hooks (mantém compatibilidade + adiciona metadados)
+    // Return hooks
     return NextResponse.json({
-      hooks: hooks.slice(0, 5), // Array de strings para compatibilidade
-      hooksDetailed: hooksDetailed.slice(0, 5), // Array com metadados completos
+      hooks: hooks.slice(0, 5),
+      hooksDetailed: hooksDetailed.slice(0, 5),
       timestamp: new Date().toISOString(),
       tokens_used: {
         input: completion.usage?.prompt_tokens || 0,
@@ -148,11 +122,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Generate hooks error:', error);
 
-    // Handle OpenAI specific errors
     if (error instanceof Error) {
       if (error.message.includes('rate limit')) {
         return NextResponse.json(
-          { error: 'Limite de requisições da IA atingido. Aguarde 1 minuto.', code: 'API_RATE_LIMIT' },
+          { error: 'Limite de requisicoes da IA atingido. Aguarde 1 minuto.', code: 'API_RATE_LIMIT' },
           { status: 429 }
         );
       }

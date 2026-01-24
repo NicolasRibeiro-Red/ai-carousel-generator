@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { emailSchema } from '@/lib/validations/schemas';
+import { cookies } from 'next/headers';
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,25 +12,26 @@ export async function POST(request: NextRequest) {
     const emailValidation = emailSchema.safeParse(email);
     if (!emailValidation.success) {
       return NextResponse.json(
-        { error: 'Email inválido', code: 'INVALID_EMAIL' },
+        { error: 'Email invalido', code: 'INVALID_EMAIL' },
         { status: 400 }
       );
     }
+
+    const normalizedEmail = email.toLowerCase().trim();
 
     // Check if email is whitelisted
     const supabase = createAdminClient();
     const { data: user, error } = await supabase
       .from('users')
-      .select('id, is_whitelisted, role')
-      .eq('email', email.toLowerCase())
+      .select('id, email, is_whitelisted, role, name')
+      .eq('email', normalizedEmail)
       .single();
 
     if (error || !user) {
-      // User doesn't exist - not whitelisted
       return NextResponse.json(
         {
-          error: 'Email não autorizado. Se você é aluno do curso, entre em contato com o suporte.',
-          code: 'EMAIL_NOT_WHITELISTED',
+          error: 'Email nao autorizado. Entre em contato com o suporte.',
+          code: 'EMAIL_NOT_FOUND',
         },
         { status: 403 }
       );
@@ -38,18 +40,40 @@ export async function POST(request: NextRequest) {
     if (!user.is_whitelisted) {
       return NextResponse.json(
         {
-          error: 'Email não autorizado. Se você é aluno do curso, entre em contato com o suporte.',
+          error: 'Email nao autorizado. Entre em contato com o suporte.',
           code: 'EMAIL_NOT_WHITELISTED',
         },
         { status: 403 }
       );
     }
 
-    // Email is whitelisted
+    // Create simple session cookie
+    const sessionData = {
+      user_id: user.id,
+      email: user.email,
+      role: user.role,
+      name: user.name,
+      logged_in_at: new Date().toISOString(),
+    };
+
+    const cookieStore = await cookies();
+    cookieStore.set('breathai_session', JSON.stringify(sessionData), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      path: '/',
+    });
+
     return NextResponse.json(
       {
-        message: 'Email autorizado. Enviando link de acesso...',
-        email: email.toLowerCase(),
+        message: 'Login realizado com sucesso!',
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        },
       },
       { status: 200 }
     );

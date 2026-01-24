@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,7 +11,6 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,12 +32,10 @@ export default function LoginPage() {
         return;
       }
 
-      // Login successful - redirect to home
-      router.push('/');
-      router.refresh();
-    } catch (err) {
+      // Login successful - force full page reload to pick up cookie
+      window.location.href = '/';
+    } catch {
       setError('Erro ao conectar. Tente novamente.');
-    } finally {
       setIsLoading(false);
     }
   };

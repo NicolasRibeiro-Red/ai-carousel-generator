@@ -1,6 +1,7 @@
 'use client';
 
 import { useCarouselStore } from '@/stores/carousel-store';
+import { useAudioRecorder } from '@/hooks/use-audio-recorder';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -20,7 +21,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Card, CardContent } from '@/components/ui/card';
-import { Loader2, Sparkles, Settings2, Wand2 } from 'lucide-react';
+import { Loader2, Sparkles, Settings2, Wand2, Mic, Square } from 'lucide-react';
 
 interface IdeaFormProps {
   onSubmit: () => void;
@@ -34,6 +35,14 @@ export function IdeaForm({ onSubmit, error }: IdeaFormProps) {
     isGeneratingHooks,
   } = useCarouselStore();
 
+  const {
+    isRecording,
+    isTranscribing,
+    error: audioError,
+    startRecording,
+    stopRecording,
+  } = useAudioRecorder();
+
   const charCount = formData.ideia.length;
   const isValid = charCount >= 10 && charCount <= 500;
   const isOverLimit = charCount > 500;
@@ -45,24 +54,81 @@ export function IdeaForm({ onSubmit, error }: IdeaFormProps) {
     }
   };
 
+  const handleAudioToggle = async () => {
+    if (isRecording) {
+      const transcription = await stopRecording();
+      if (transcription) {
+        // Append transcription to existing text or set as new text
+        const newText = formData.ideia
+          ? `${formData.ideia} ${transcription}`
+          : transcription;
+        setFormData({ ideia: newText.slice(0, 500) });
+      }
+    } else {
+      await startRecording();
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <Card>
         <CardContent className="pt-6 space-y-6">
           {/* Main Input */}
           <div className="space-y-2">
-            <Label htmlFor="ideia" className="text-base font-medium">
-              Qual sua ideia? <span className="text-red-500">*</span>
-            </Label>
-            <Textarea
-              id="ideia"
-              placeholder="Ex: Como usar respiração para controlar ansiedade no trabalho"
-              value={formData.ideia}
-              onChange={(e) => setFormData({ ideia: e.target.value })}
-              disabled={isGeneratingHooks}
-              className="min-h-[120px] text-base resize-none"
-              maxLength={550}
-            />
+            <div className="flex items-center justify-between">
+              <Label htmlFor="ideia" className="text-base font-medium">
+                Qual sua ideia? <span className="text-red-500">*</span>
+              </Label>
+              <Button
+                type="button"
+                variant={isRecording ? 'destructive' : 'outline'}
+                size="sm"
+                onClick={handleAudioToggle}
+                disabled={isGeneratingHooks || isTranscribing}
+                className="gap-2"
+              >
+                {isTranscribing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Transcrevendo...
+                  </>
+                ) : isRecording ? (
+                  <>
+                    <Square className="w-4 h-4" />
+                    Parar
+                  </>
+                ) : (
+                  <>
+                    <Mic className="w-4 h-4" />
+                    Gravar Audio
+                  </>
+                )}
+              </Button>
+            </div>
+            <div className="relative">
+              <Textarea
+                id="ideia"
+                placeholder="Ex: Como usar respiração para controlar ansiedade no trabalho"
+                value={formData.ideia}
+                onChange={(e) => setFormData({ ideia: e.target.value })}
+                disabled={isGeneratingHooks || isRecording || isTranscribing}
+                className={`min-h-[120px] text-base resize-none ${
+                  isRecording ? 'border-red-500 animate-pulse' : ''
+                }`}
+                maxLength={550}
+              />
+              {isRecording && (
+                <div className="absolute top-2 right-2 flex items-center gap-2 text-red-500 text-sm">
+                  <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                  Gravando...
+                </div>
+              )}
+            </div>
+            {(audioError || error) && (
+              <div className="p-3 rounded-lg bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-200 text-sm">
+                {audioError || error}
+              </div>
+            )}
             <div className="flex justify-between items-center">
               <span
                 className={`text-sm ${
@@ -219,19 +285,12 @@ export function IdeaForm({ onSubmit, error }: IdeaFormProps) {
         </CardContent>
       </Card>
 
-      {/* Error Message */}
-      {error && (
-        <div className="p-4 rounded-lg bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-200 text-sm">
-          {error}
-        </div>
-      )}
-
       {/* Submit Button */}
       <Button
         type="submit"
         size="lg"
         className="w-full h-14 text-lg font-medium"
-        disabled={!isValid || isGeneratingHooks}
+        disabled={!isValid || isGeneratingHooks || isRecording || isTranscribing}
       >
         {isGeneratingHooks ? (
           <>

@@ -10,7 +10,7 @@ interface ExportOptions {
   verified: boolean;
 }
 
-// Instagram carousel dimensions
+// Instagram carousel dimensions (4:5 portrait - recommended)
 const SLIDE_WIDTH = 1080;
 const SLIDE_HEIGHT = 1350;
 
@@ -18,56 +18,23 @@ const SLIDE_HEIGHT = 1350;
 const THEMES = {
   light: {
     background: '#FFFFFF',
-    cardBg: '#FFFFFF',
     text: '#0F1419',
     textSecondary: '#536471',
     border: '#EFF3F4',
-    metrics: '#536471',
   },
   dim: {
     background: '#15202B',
-    cardBg: '#15202B',
     text: '#F7F9F9',
     textSecondary: '#8B98A5',
     border: '#38444D',
-    metrics: '#8B98A5',
   },
   dark: {
     background: '#000000',
-    cardBg: '#000000',
     text: '#E7E9EA',
     textSecondary: '#71767B',
     border: '#2F3336',
-    metrics: '#71767B',
   },
 };
-
-// Generate random engagement metrics
-function generateMetrics() {
-  const views = Math.floor(Math.random() * 900000) + 100000;
-  const likes = Math.floor(views * (Math.random() * 0.05 + 0.02));
-  const retweets = Math.floor(likes * (Math.random() * 0.3 + 0.1));
-  const replies = Math.floor(retweets * (Math.random() * 0.5 + 0.2));
-  const bookmarks = Math.floor(likes * (Math.random() * 0.1 + 0.02));
-
-  return {
-    views: formatNumber(views),
-    likes: formatNumber(likes),
-    retweets: formatNumber(retweets),
-    replies: formatNumber(replies),
-    bookmarks: formatNumber(bookmarks),
-  };
-}
-
-function formatNumber(num: number): string {
-  if (num >= 1000000) {
-    return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
-  }
-  if (num >= 1000) {
-    return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
-  }
-  return num.toString();
-}
 
 // Load image helper
 function loadImage(src: string): Promise<HTMLImageElement> {
@@ -84,8 +51,7 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 function wrapText(
   ctx: CanvasRenderingContext2D,
   text: string,
-  maxWidth: number,
-  lineHeight: number
+  maxWidth: number
 ): string[] {
   const words = text.split(' ');
   const lines: string[] = [];
@@ -132,7 +98,7 @@ function roundRect(
   ctx.closePath();
 }
 
-// Native Canvas rendering
+// Native Canvas rendering - Clean style matching preview
 async function renderSlideToCanvasNative(
   slide: Slide,
   totalSlides: number,
@@ -143,7 +109,6 @@ async function renderSlideToCanvasNative(
   verified: boolean
 ): Promise<HTMLCanvasElement> {
   const colors = THEMES[theme];
-  const metrics = generateMetrics();
 
   const canvas = document.createElement('canvas');
   canvas.width = SLIDE_WIDTH;
@@ -154,30 +119,15 @@ async function renderSlideToCanvasNative(
   ctx.fillStyle = colors.background;
   ctx.fillRect(0, 0, SLIDE_WIDTH, SLIDE_HEIGHT);
 
-  // Card dimensions
-  const padding = 60;
-  const cardX = padding;
-  const cardY = padding;
-  const cardWidth = SLIDE_WIDTH - padding * 2;
-  const cardHeight = SLIDE_HEIGHT - padding * 2 - 40; // Leave space for dots
+  // Content padding
+  const padding = 80;
+  const contentX = padding;
+  let currentY = padding;
 
-  // Card background with border
-  ctx.fillStyle = colors.cardBg;
-  roundRect(ctx, cardX, cardY, cardWidth, cardHeight, 16);
-  ctx.fill();
+  // ============ HEADER: Avatar + Name + Username ============
+  const avatarSize = 100;
 
-  ctx.strokeStyle = colors.border;
-  ctx.lineWidth = 1;
-  roundRect(ctx, cardX, cardY, cardWidth, cardHeight, 16);
-  ctx.stroke();
-
-  // Content area
-  const contentPadding = 30;
-  const contentX = cardX + contentPadding;
-  let currentY = cardY + contentPadding;
-
-  // Avatar
-  const avatarSize = 56;
+  // Draw avatar circle
   ctx.save();
   ctx.beginPath();
   ctx.arc(contentX + avatarSize / 2, currentY + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2);
@@ -193,7 +143,7 @@ async function renderSlideToCanvasNative(
       ctx.fillStyle = colors.border;
       ctx.fillRect(contentX, currentY, avatarSize, avatarSize);
       ctx.fillStyle = colors.textSecondary;
-      ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.font = 'bold 40px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(
@@ -204,9 +154,9 @@ async function renderSlideToCanvasNative(
     }
   } else {
     ctx.fillStyle = colors.border;
-    ctx.fillRect(contentX, currentY, avatarSize, avatarSize);
+    ctx.fillRect(contentX, contentX, avatarSize, avatarSize);
     ctx.fillStyle = colors.textSecondary;
-    ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.font = 'bold 40px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(
@@ -217,69 +167,76 @@ async function renderSlideToCanvasNative(
   }
   ctx.restore();
 
-  // Name and username
-  const nameX = contentX + avatarSize + 15;
+  // Name and username next to avatar
+  const nameX = contentX + avatarSize + 24;
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top';
 
   // Display name
   ctx.fillStyle = colors.text;
-  ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  ctx.fillText(displayName || username, nameX, currentY + 8);
+  ctx.font = 'bold 36px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  ctx.fillText(displayName || username, nameX, currentY + 20);
 
-  // Verified badge (simple blue circle with check)
+  // Verified badge
   if (verified) {
-    const badgeX = nameX + ctx.measureText(displayName || username).width + 8;
+    const nameWidth = ctx.measureText(displayName || username).width;
+    const badgeX = nameX + nameWidth + 12;
+    const badgeY = currentY + 28;
+
+    // Blue circle
     ctx.fillStyle = '#1D9BF0';
     ctx.beginPath();
-    ctx.arc(badgeX + 10, currentY + 18, 10, 0, Math.PI * 2);
+    ctx.arc(badgeX + 14, badgeY + 10, 14, 0, Math.PI * 2);
     ctx.fill();
-    // Check mark
+
+    // White check mark
     ctx.strokeStyle = '#FFFFFF';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
     ctx.beginPath();
-    ctx.moveTo(badgeX + 5, currentY + 18);
-    ctx.lineTo(badgeX + 9, currentY + 22);
-    ctx.lineTo(badgeX + 15, currentY + 14);
+    ctx.moveTo(badgeX + 7, badgeY + 10);
+    ctx.lineTo(badgeX + 12, badgeY + 15);
+    ctx.lineTo(badgeX + 21, badgeY + 5);
     ctx.stroke();
   }
 
   // Username
   ctx.fillStyle = colors.textSecondary;
-  ctx.font = '17px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  ctx.font = '30px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
   const usernameText = username.startsWith('@') ? username : `@${username}`;
-  ctx.fillText(usernameText, nameX, currentY + 34);
+  ctx.fillText(usernameText, nameX, currentY + 62);
 
-  currentY += avatarSize + 40;
+  currentY += avatarSize + 60;
 
-  // Tweet content - centered vertically
+  // ============ MAIN CONTENT: Tweet text ============
   const textAreaTop = currentY;
-  const textAreaBottom = cardY + cardHeight - 200; // Leave space for footer
+  const textAreaBottom = SLIDE_HEIGHT - 180; // Space for footer
   const textAreaHeight = textAreaBottom - textAreaTop;
+  const maxTextWidth = SLIDE_WIDTH - padding * 2;
 
   // Determine font size based on text length
   let fontSize: number;
   if (slide.texto.length > 200) {
-    fontSize = 36;
-  } else if (slide.texto.length > 150) {
     fontSize = 42;
-  } else if (slide.texto.length > 100) {
+  } else if (slide.texto.length > 150) {
     fontSize = 48;
+  } else if (slide.texto.length > 100) {
+    fontSize = 54;
   } else if (slide.texto.length > 60) {
-    fontSize = 56;
+    fontSize = 62;
   } else {
-    fontSize = 64;
+    fontSize = 72;
   }
 
-  ctx.font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+  ctx.font = `500 ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
   ctx.fillStyle = colors.text;
 
-  const maxTextWidth = cardWidth - contentPadding * 2;
-  const lineHeight = fontSize * 1.4;
-  const lines = wrapText(ctx, slide.texto, maxTextWidth, lineHeight);
+  const lineHeight = fontSize * 1.35;
+  const lines = wrapText(ctx, slide.texto, maxTextWidth);
   const totalTextHeight = lines.length * lineHeight;
 
-  // Center text vertically
+  // Center text vertically in the available space
   const textStartY = textAreaTop + (textAreaHeight - totalTextHeight) / 2;
 
   ctx.textAlign = 'left';
@@ -288,12 +245,12 @@ async function renderSlideToCanvasNative(
     ctx.fillText(line, contentX, textStartY + index * lineHeight);
   });
 
-  // Footer area
-  currentY = cardY + cardHeight - 180;
+  // ============ FOOTER: Timestamp + Slide indicator ============
+  currentY = SLIDE_HEIGHT - 140;
 
   // Timestamp
   ctx.fillStyle = colors.textSecondary;
-  ctx.font = '17px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  ctx.font = '28px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
   const now = new Date();
   const hours = now.getHours();
   const minutes = now.getMinutes().toString().padStart(2, '0');
@@ -301,50 +258,24 @@ async function renderSlideToCanvasNative(
   const displayHours = hours % 12 || 12;
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const timestamp = `${displayHours}:${minutes} ${ampm} · ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+
+  // Center timestamp and slide number
+  const slideText = `${slide.numero}/${totalSlides}`;
+  const timestampWidth = ctx.measureText(timestamp).width;
+  const slideTextWidth = ctx.measureText(slideText).width;
+
+  ctx.textAlign = 'left';
   ctx.fillText(timestamp, contentX, currentY);
 
-  // Divider
-  currentY += 35;
-  ctx.strokeStyle = colors.border;
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(contentX, currentY);
-  ctx.lineTo(cardX + cardWidth - contentPadding, currentY);
-  ctx.stroke();
+  ctx.textAlign = 'right';
+  ctx.fillText(slideText, SLIDE_WIDTH - padding, currentY);
 
-  // Views
-  currentY += 20;
-  ctx.fillStyle = colors.text;
-  ctx.font = 'bold 17px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  ctx.fillText(metrics.views, contentX, currentY);
-  ctx.fillStyle = colors.textSecondary;
-  ctx.font = '17px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  ctx.fillText(' Views', contentX + ctx.measureText(metrics.views).width + 5, currentY);
-
-  // Divider
-  currentY += 35;
-  ctx.strokeStyle = colors.border;
-  ctx.beginPath();
-  ctx.moveTo(contentX, currentY);
-  ctx.lineTo(cardX + cardWidth - contentPadding, currentY);
-  ctx.stroke();
-
-  // Metrics row
-  currentY += 20;
-  ctx.fillStyle = colors.metrics;
-  ctx.font = '15px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  const metricsSpacing = (cardWidth - contentPadding * 2) / 5;
-  const metricsList = [metrics.replies, metrics.retweets, metrics.likes, metrics.bookmarks, ''];
-  metricsList.forEach((value, index) => {
-    ctx.fillText(value, contentX + index * metricsSpacing, currentY);
-  });
-
-  // Slide indicator dots at bottom
-  const dotsY = SLIDE_HEIGHT - 35;
-  const dotSpacing = 12;
-  const activeDotWidth = 24;
-  const inactiveDotWidth = 8;
-  const dotHeight = 8;
+  // ============ SLIDE INDICATOR DOTS ============
+  currentY = SLIDE_HEIGHT - 60;
+  const dotSpacing = 16;
+  const activeDotWidth = 32;
+  const inactiveDotWidth = 12;
+  const dotHeight = 12;
 
   // Calculate total width of all dots
   let totalDotsWidth = 0;
@@ -360,7 +291,7 @@ async function renderSlideToCanvasNative(
     const width = isActive ? activeDotWidth : inactiveDotWidth;
 
     ctx.fillStyle = isActive ? '#1D9BF0' : colors.border;
-    roundRect(ctx, dotX, dotsY, width, dotHeight, 4);
+    roundRect(ctx, dotX, currentY, width, dotHeight, 6);
     ctx.fill();
 
     dotX += width + dotSpacing;
@@ -396,7 +327,7 @@ export async function renderSlideToBlob(
         else reject(new Error('Failed to create blob'));
       },
       'image/png',
-      0.95
+      1.0
     );
   });
 }
@@ -417,7 +348,7 @@ export async function exportSlidesToZip(options: ExportOptions): Promise<void> {
       username,
       verified
     );
-    zip.file(`breathai_slide_${slide.numero}.png`, blob);
+    zip.file(`slide_${slide.numero}.png`, blob);
   }
 
   // Generate zip file
@@ -427,7 +358,7 @@ export async function exportSlidesToZip(options: ExportOptions): Promise<void> {
   const url = URL.createObjectURL(zipBlob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `breathai_carrossel_${Date.now()}.zip`;
+  a.download = `carrossel_${Date.now()}.zip`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -457,7 +388,7 @@ export async function exportSingleSlide(
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `breathai_slide_${slide.numero}.png`;
+  a.download = `slide_${slide.numero}.png`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);

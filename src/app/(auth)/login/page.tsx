@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { createBrowserClient } from '@supabase/ssr';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,8 +10,14 @@ import { Loader2, Sparkles } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,21 +25,22 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.error || 'Erro ao fazer login');
+      if (authError) {
+        if (authError.message.includes('Invalid login credentials')) {
+          setError('Email ou senha incorretos');
+        } else {
+          setError(authError.message);
+        }
         setIsLoading(false);
         return;
       }
 
-      // Login successful - force full page reload to pick up cookie
+      // Login successful - redirect to home
       window.location.href = '/';
     } catch {
       setError('Erro ao conectar. Tente novamente.');
@@ -67,6 +75,20 @@ export default function LoginPage() {
             />
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="password">Senha</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              disabled={isLoading}
+              className="h-12"
+            />
+          </div>
+
           {error && (
             <div className="p-4 rounded-lg text-sm bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-200">
               {error}
@@ -76,7 +98,7 @@ export default function LoginPage() {
           <Button
             type="submit"
             className="w-full h-12 text-base font-medium"
-            disabled={isLoading || !email}
+            disabled={isLoading || !email || !password}
           >
             {isLoading ? (
               <>

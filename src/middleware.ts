@@ -1,7 +1,8 @@
+import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 // Routes that don't require authentication
-const publicRoutes = ['/login', '/api/auth/login'];
+const publicRoutes = ['/login', '/api/auth'];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -11,11 +12,38 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check for session cookie
-  const sessionCookie = request.cookies.get('breathai_session');
+  let supabaseResponse = NextResponse.next({
+    request,
+  });
 
-  // If no session and trying to access protected route, redirect to login
-  if (!sessionCookie?.value) {
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          );
+          supabaseResponse = NextResponse.next({
+            request,
+          });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
     // Allow API routes to return 401 instead of redirecting
     if (pathname.startsWith('/api/')) {
       return NextResponse.json(
@@ -28,26 +56,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Verify session is valid JSON
-  try {
-    const session = JSON.parse(sessionCookie.value);
-    if (!session.user_id || !session.email) {
-      throw new Error('Invalid session');
-    }
-  } catch {
-    // Invalid session, clear cookie and redirect
-    const response = pathname.startsWith('/api/')
-      ? NextResponse.json(
-          { error: 'Sessao invalida', code: 'INVALID_SESSION' },
-          { status: 401 }
-        )
-      : NextResponse.redirect(new URL('/login', request.url));
-
-    response.cookies.delete('breathai_session');
-    return response;
-  }
-
-  return NextResponse.next();
+  return supabaseResponse;
 }
 
 export const config = {

@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Download, Share2, Loader2, Check, BadgeCheck, Pencil, Trash2 } from 'lucide-react';
+import { Download, Loader2, Check, BadgeCheck, Pencil, Trash2 } from 'lucide-react';
 import { renderSlideToBlob } from '@/lib/canvas/export';
 import type { Slide, TwitterTheme } from '@/types';
 
@@ -57,7 +57,6 @@ export function SlidePreview({
 }: SlidePreviewProps) {
   const colors = THEMES[theme];
   const [isDownloading, setIsDownloading] = useState(false);
-  const [isSharing, setIsSharing] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(slide.texto);
@@ -129,40 +128,6 @@ export function SlidePreview({
       console.error('Download error:', error);
     } finally {
       setIsDownloading(false);
-    }
-  };
-
-  const handleShare = async () => {
-    if (!navigator.share) {
-      // Fallback to download if share not available
-      handleDownload();
-      return;
-    }
-
-    setIsSharing(true);
-    try {
-      const blob = await renderSlideToBlob(
-        slide,
-        totalSlides,
-        theme,
-        profilePhoto,
-        displayName,
-        username,
-        verified
-      );
-      const file = new File([blob], `slide_${slide.numero}.png`, { type: 'image/png' });
-
-      await navigator.share({
-        files: [file],
-        title: `Slide ${slide.numero}`,
-      });
-    } catch (error) {
-      // User cancelled or error
-      if ((error as Error).name !== 'AbortError') {
-        console.error('Share error:', error);
-      }
-    } finally {
-      setIsSharing(false);
     }
   };
 
@@ -347,7 +312,7 @@ export function SlidePreview({
           size="sm"
           className="flex-1"
           onClick={handleDownload}
-          disabled={isDownloading || isSharing || isEditing}
+          disabled={isDownloading || isEditing}
         >
           {isDownloading ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -364,28 +329,13 @@ export function SlidePreview({
           )}
         </Button>
 
-        {typeof navigator !== 'undefined' && 'share' in navigator && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleShare}
-            disabled={isDownloading || isSharing || isEditing}
-          >
-            {isSharing ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Share2 className="w-4 h-4" />
-            )}
-          </Button>
-        )}
-
         {/* Delete Button */}
         {onDelete && canDelete && (
           <Button
             variant="outline"
             size="sm"
             onClick={() => onDelete(slide.numero)}
-            disabled={isDownloading || isSharing || isEditing}
+            disabled={isDownloading || isEditing}
             className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
           >
             <Trash2 className="w-4 h-4" />

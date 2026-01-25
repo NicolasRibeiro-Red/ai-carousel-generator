@@ -1,4 +1,3 @@
-import JSZip from 'jszip';
 import type { Slide, TwitterTheme } from '@/types';
 
 interface ExportOptions {
@@ -332,10 +331,9 @@ export async function renderSlideToBlob(
   });
 }
 
-// Export all slides to ZIP
-export async function exportSlidesToZip(options: ExportOptions): Promise<void> {
+// Export all slides as individual images
+export async function exportAllSlides(options: ExportOptions): Promise<void> {
   const { slides, theme, profilePhoto, displayName, username, verified } = options;
-  const zip = new JSZip();
 
   for (let i = 0; i < slides.length; i++) {
     const slide = slides[i];
@@ -348,21 +346,22 @@ export async function exportSlidesToZip(options: ExportOptions): Promise<void> {
       username,
       verified
     );
-    zip.file(`slide_${slide.numero}.png`, blob);
+
+    // Trigger download for each slide
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `slide_${slide.numero}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    // Small delay between downloads to avoid browser blocking
+    if (i < slides.length - 1) {
+      await new Promise(resolve => setTimeout(resolve, 300));
+    }
   }
-
-  // Generate zip file
-  const zipBlob = await zip.generateAsync({ type: 'blob' });
-
-  // Trigger download
-  const url = URL.createObjectURL(zipBlob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `carrossel_${Date.now()}.zip`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
 }
 
 // Export individual slide

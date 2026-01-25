@@ -20,7 +20,7 @@ import {
   Moon,
   BadgeCheck,
 } from 'lucide-react';
-import { exportSlidesToZip } from '@/lib/canvas/export';
+import { exportAllSlides } from '@/lib/canvas/export';
 import type { TwitterTheme } from '@/types';
 
 export default function PreviewPage() {
@@ -85,7 +85,7 @@ export default function PreviewPage() {
     setExportSuccess(false);
 
     try {
-      await exportSlidesToZip({
+      await exportAllSlides({
         slides: carousel.slides,
         theme,
         profilePhoto,
@@ -309,12 +309,12 @@ export default function PreviewPage() {
           {isExporting ? (
             <>
               <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              Exportando slides...
+              Baixando imagens...
             </>
           ) : (
             <>
               <Download className="mr-2 h-5 w-5" />
-              Baixar Todos os Slides (ZIP)
+              Baixar Todas as Imagens
             </>
           )}
         </Button>

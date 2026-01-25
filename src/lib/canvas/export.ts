@@ -154,7 +154,7 @@ async function renderSlideToCanvasNative(
     }
   } else {
     ctx.fillStyle = colors.border;
-    ctx.fillRect(contentX, contentX, avatarSize, avatarSize);
+    ctx.fillRect(contentX, currentY, avatarSize, avatarSize);
     ctx.fillStyle = colors.textSecondary;
     ctx.font = 'bold 40px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
     ctx.textAlign = 'center';

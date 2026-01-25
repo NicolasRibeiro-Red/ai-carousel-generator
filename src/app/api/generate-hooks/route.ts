@@ -96,9 +96,9 @@ export async function POST(request: NextRequest) {
 
     // Create OpenAI client at runtime to ensure env vars are available
     const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+      apiKey: process.env.OPENAI_API_KEY?.trim(),
     });
-    const model = process.env.OPENAI_MODEL || 'gpt-4o';
+    const model = (process.env.OPENAI_MODEL || 'gpt-4o').trim();
 
     // Generate hooks with OpenAI
     const completion = await openai.chat.completions.create({

@@ -145,6 +145,12 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Generate hooks error:', error);
 
+    // Return detailed error in development/for debugging
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorStack = error instanceof Error ? error.stack : '';
+
+    console.error('Error details:', { message: errorMessage, stack: errorStack });
+
     if (error instanceof Error) {
       if (error.message.includes('rate limit')) {
         return NextResponse.json(
@@ -152,10 +158,18 @@ export async function POST(request: NextRequest) {
           { status: 429 }
         );
       }
+
+      // Return more specific error for debugging
+      if (error.message.includes('OPENAI_API_KEY')) {
+        return NextResponse.json(
+          { error: 'Erro de configuracao da API OpenAI', code: 'CONFIG_ERROR', details: errorMessage },
+          { status: 500 }
+        );
+      }
     }
 
     return NextResponse.json(
-      { error: 'Erro interno do servidor', code: 'INTERNAL_ERROR' },
+      { error: 'Erro interno do servidor', code: 'INTERNAL_ERROR', details: errorMessage },
       { status: 500 }
     );
   }

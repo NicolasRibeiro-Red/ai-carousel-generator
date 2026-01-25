@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
-import { openai, DEFAULT_MODEL, parseJsonResponse } from '@/lib/openai/client';
+import OpenAI from 'openai';
+import { parseJsonResponse } from '@/lib/openai/client';
+
+// Force dynamic to ensure env vars are available at runtime
+export const dynamic = 'force-dynamic';
 import {
   HOOKS_SYSTEM_PROMPT,
   buildHooksUserPrompt,
@@ -90,9 +94,15 @@ export async function POST(request: NextRequest) {
 
     const { ideia, objetivo, tom } = validation.data;
 
+    // Create OpenAI client at runtime to ensure env vars are available
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+    const model = process.env.OPENAI_MODEL || 'gpt-4o';
+
     // Generate hooks with OpenAI
     const completion = await openai.chat.completions.create({
-      model: DEFAULT_MODEL,
+      model,
       messages: [
         { role: 'system', content: HOOKS_SYSTEM_PROMPT },
         { role: 'user', content: buildHooksUserPrompt(ideia, objetivo, tom) },

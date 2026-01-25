@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
-import { openai, DEFAULT_MODEL, parseJsonResponse } from '@/lib/openai/client';
+import OpenAI from 'openai';
+import { parseJsonResponse } from '@/lib/openai/client';
 import { CAROUSEL_SYSTEM_PROMPT, buildCarouselUserPrompt } from '@/lib/openai/prompts/carousel';
 import { generateCarouselSchema } from '@/lib/validations/schemas';
 import type { Slide } from '@/types';
+
+// Force dynamic to ensure env vars are available at runtime
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
@@ -56,11 +60,17 @@ export async function POST(request: NextRequest) {
 
     const { hook_escolhido, ideia_original, config } = validation.data;
 
+    // Create OpenAI client at runtime to ensure env vars are available
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+    const model = process.env.OPENAI_MODEL || 'gpt-4o';
+
     // Generate carousel with OpenAI
     const autoSlides = config.auto_slides ?? true;
 
     const completion = await openai.chat.completions.create({
-      model: DEFAULT_MODEL,
+      model,
       messages: [
         { role: 'system', content: CAROUSEL_SYSTEM_PROMPT },
         {

@@ -99,8 +99,18 @@ export function SlidePreview({
     // Don't save on Enter since users might want multi-line text
   };
 
+  const [downloadError, setDownloadError] = useState<string | null>(null);
+
   const handleDownload = async () => {
     setIsDownloading(true);
+    setDownloadError(null);
+
+    console.log('Starting download for slide:', slide.numero);
+    console.log('Theme:', theme);
+    console.log('Profile photo:', profilePhoto);
+    console.log('Display name:', displayName);
+    console.log('Username:', username);
+
     try {
       const blob = await renderSlideToBlob(
         slide,
@@ -111,6 +121,8 @@ export function SlidePreview({
         username,
         verified
       );
+
+      console.log('Blob created:', blob.size, 'bytes');
 
       // Create download link
       const url = URL.createObjectURL(blob);
@@ -126,6 +138,9 @@ export function SlidePreview({
       setTimeout(() => setDownloaded(false), 2000);
     } catch (error) {
       console.error('Download error:', error);
+      const errorMsg = error instanceof Error ? error.message : 'Erro desconhecido';
+      setDownloadError(errorMsg);
+      alert('Erro ao baixar: ' + errorMsg);
     } finally {
       setIsDownloading(false);
     }

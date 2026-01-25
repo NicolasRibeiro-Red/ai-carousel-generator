@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth/session';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { openai, DEFAULT_MODEL, parseJsonResponse } from '@/lib/openai/client';
 import {
   HOOKS_SYSTEM_PROMPT,
@@ -41,10 +42,32 @@ function parseHooksResponse(content: string): { hooks: string[]; hooksDetailed: 
 
 export async function POST(request: NextRequest) {
   try {
-    // Get session from cookie
-    const session = await getSession();
+    // Get session from Supabase
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              );
+            } catch {
+              // Ignore
+            }
+          },
+        },
+      }
+    );
 
-    if (!session) {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
       return NextResponse.json(
         { error: 'Nao autenticado', code: 'UNAUTHORIZED' },
         { status: 401 }

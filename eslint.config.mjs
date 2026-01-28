@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // AIOS framework and config files
+    ".aios-core/**",
+    ".claude/**",
   ]),
 ]);
 

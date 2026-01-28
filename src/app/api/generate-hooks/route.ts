@@ -3,15 +3,16 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import OpenAI from 'openai';
 import { parseJsonResponse } from '@/lib/openai/client';
-
-// Force dynamic to ensure env vars are available at runtime
-export const dynamic = 'force-dynamic';
+import { logger } from '@/lib/logger';
 import {
   HOOKS_SYSTEM_PROMPT,
   buildHooksUserPrompt,
   type HookStructured,
 } from '@/lib/openai/prompts/hooks';
 import { generateHooksSchema } from '@/lib/validations/schemas';
+
+// Force dynamic to ensure env vars are available at runtime
+export const dynamic = 'force-dynamic';
 
 // Interface para resposta estruturada da IA
 interface AIHooksResponse {
@@ -45,6 +46,9 @@ function parseHooksResponse(content: string): { hooks: string[]; hooksDetailed: 
 }
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now();
+  logger.apiRequest('/api/generate-hooks', 'POST');
+
   try {
     // Get session from Supabase
     const cookieStore = await cookies();
@@ -127,7 +131,7 @@ export async function POST(request: NextRequest) {
       hooks = result.hooks;
       hooksDetailed = result.hooksDetailed;
     } catch (parseError) {
-      console.error('Failed to parse hooks response:', content);
+      logger.error('Failed to parse hooks response', { content }, parseError as Error);
       return NextResponse.json(
         { error: 'Erro ao processar resposta da IA. Tente novamente.', code: 'PARSE_ERROR' },
         { status: 500 }
@@ -142,6 +146,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    logger.apiResponse('/api/generate-hooks', 200, Date.now() - startTime);
+
     // Return hooks
     return NextResponse.json({
       hooks: hooks.slice(0, 5),
@@ -153,13 +159,9 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Generate hooks error:', error);
+    logger.apiError('/api/generate-hooks', error as Error);
 
-    // Return detailed error in development/for debugging
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    const errorStack = error instanceof Error ? error.stack : '';
-
-    console.error('Error details:', { message: errorMessage, stack: errorStack });
 
     if (error instanceof Error) {
       if (error.message.includes('rate limit')) {

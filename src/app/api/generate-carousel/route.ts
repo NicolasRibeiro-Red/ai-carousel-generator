@@ -5,12 +5,17 @@ import OpenAI from 'openai';
 import { parseJsonResponse } from '@/lib/openai/client';
 import { CAROUSEL_SYSTEM_PROMPT, buildCarouselUserPrompt } from '@/lib/openai/prompts/carousel';
 import { generateCarouselSchema } from '@/lib/validations/schemas';
+import { logger } from '@/lib/logger';
+import { createAdminClient } from '@/lib/supabase/server';
 import type { Slide } from '@/types';
 
 // Force dynamic to ensure env vars are available at runtime
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now();
+  logger.apiRequest('/api/generate-carousel', 'POST');
+
   try {
     // Get session from Supabase
     const cookieStore = await cookies();
@@ -103,7 +108,7 @@ export async function POST(request: NextRequest) {
     try {
       slides = parseJsonResponse<Slide[]>(content);
     } catch (parseError) {
-      console.error('Failed to parse carousel response:', content);
+      logger.error('Failed to parse carousel response', { content }, parseError as Error);
       return NextResponse.json(
         { error: 'Erro ao processar resposta da IA. Tente novamente.', code: 'PARSE_ERROR' },
         { status: 500 }
@@ -135,19 +140,49 @@ export async function POST(request: NextRequest) {
       theme: 'dark' as const,
     };
 
+    const createdAt = new Date().toISOString();
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days
+
+    // Save carousel to Supabase
+    const adminClient = createAdminClient();
+    const { data: savedCarousel, error: saveError } = await adminClient
+      .from('carousels')
+      .insert({
+        user_id: user.id,
+        original_idea: ideia_original,
+        selected_hook: hook_escolhido,
+        slides,
+        config: carouselConfig,
+        download_count: 0,
+        created_at: createdAt,
+        expires_at: expiresAt,
+      })
+      .select('id')
+      .single();
+
+    if (saveError) {
+      logger.error('Failed to save carousel to Supabase', { error: saveError.message });
+      // Continue anyway - don't fail the request just because we couldn't save
+    }
+
+    const carouselId = savedCarousel?.id || `carousel-${Date.now()}`;
+
+    logger.apiResponse('/api/generate-carousel', 200, Date.now() - startTime);
+    logger.info('Carousel generated and saved', { carouselId, userId: user.id, slidesCount: slides.length });
+
     // Return carousel data
     return NextResponse.json({
-      carousel_id: 'carousel-' + Date.now(),
+      carousel_id: carouselId,
       slides,
       config: carouselConfig,
-      created_at: new Date().toISOString(),
+      created_at: createdAt,
       tokens_used: {
         input: completion.usage?.prompt_tokens || 0,
         output: completion.usage?.completion_tokens || 0,
       },
     });
   } catch (error) {
-    console.error('Generate carousel error:', error);
+    logger.apiError('/api/generate-carousel', error as Error);
 
     if (error instanceof Error) {
       if (error.message.includes('rate limit')) {

@@ -5,30 +5,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Download, Loader2, Check, BadgeCheck, Pencil, Trash2 } from 'lucide-react';
-import { renderSlideToBlob } from '@/lib/canvas/export';
+import { renderSlideToBlob } from '@/lib/canvas';
+import { THEME_COLORS } from '@/lib/constants';
 import type { Slide, TwitterTheme } from '@/types';
-
-// Twitter theme colors for preview
-const THEMES = {
-  light: {
-    background: '#FFFFFF',
-    text: '#0F1419',
-    textSecondary: '#536471',
-    border: '#EFF3F4',
-  },
-  dim: {
-    background: '#15202B',
-    text: '#F7F9F9',
-    textSecondary: '#8B98A5',
-    border: '#38444D',
-  },
-  dark: {
-    background: '#000000',
-    text: '#E7E9EA',
-    textSecondary: '#71767B',
-    border: '#2F3336',
-  },
-};
 
 interface SlidePreviewProps {
   slide: Slide;
@@ -55,7 +34,7 @@ export function SlidePreview({
   onDelete,
   canDelete = true,
 }: SlidePreviewProps) {
-  const colors = THEMES[theme];
+  const colors = THEME_COLORS[theme];
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -112,15 +91,15 @@ export function SlidePreview({
     console.log('Username:', username);
 
     try {
-      const blob = await renderSlideToBlob(
+      const blob = await renderSlideToBlob({
         slide,
         totalSlides,
         theme,
         profilePhoto,
         displayName,
         username,
-        verified
-      );
+        verified,
+      });
 
       console.log('Blob created:', blob.size, 'bytes');
 

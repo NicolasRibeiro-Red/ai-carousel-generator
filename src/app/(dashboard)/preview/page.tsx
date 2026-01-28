@@ -20,7 +20,7 @@ import {
   Moon,
   BadgeCheck,
 } from 'lucide-react';
-import { exportAllSlides } from '@/lib/canvas/export';
+import { exportAllSlides } from '@/lib/canvas';
 import type { TwitterTheme } from '@/types';
 
 export default function PreviewPage() {

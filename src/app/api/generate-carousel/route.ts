@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth, AuthError } from '@/lib/supabase/auth';
 import { generateCarousel, saveCarousel } from '@/lib/services';
+import { getReferencesForCarousel } from '@/lib/services/references.service';
 import { generateCarouselSchema } from '@/lib/validations/schemas';
 import { logger } from '@/lib/logger';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/lib/constants';
@@ -49,6 +50,14 @@ export async function POST(request: NextRequest) {
       theme: 'dark' as const,
     };
 
+    // Get scientific references based on content
+    const scientificReferences = getReferencesForCarousel(
+      result.slides,
+      hook_escolhido,
+      ideia_original,
+      3 // Limit to 3 references
+    );
+
     // Save carousel to database
     const saved = await saveCarousel({
       userId: user.id,
@@ -63,6 +72,7 @@ export async function POST(request: NextRequest) {
       carouselId: saved.carouselId,
       userId: user.id,
       slidesCount: result.slides.length,
+      referencesCount: scientificReferences.length,
     });
 
     return NextResponse.json({
@@ -71,6 +81,7 @@ export async function POST(request: NextRequest) {
       config: carouselConfig,
       created_at: saved.createdAt,
       tokens_used: result.tokensUsed,
+      scientific_references: scientificReferences.length > 0 ? scientificReferences : undefined,
     });
   } catch (error) {
     logger.apiError('/api/generate-carousel', error as Error);

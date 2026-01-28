@@ -6,6 +6,22 @@ import type { CarouselConfig, Slide } from './carousel.types';
 import type { HookDetailed } from './hook.types';
 
 // ==========================================
+// Scientific References
+// ==========================================
+
+export interface ScientificReference {
+  id: string;
+  title: string;
+  authors: string[];
+  journal: string;
+  year: number;
+  doi: string;
+  keyFindings: string[];
+  topics: string[];
+  reliability: 'peer-reviewed' | 'meta-analysis' | 'systematic-review';
+}
+
+// ==========================================
 // Generate Hooks
 // ==========================================
 
@@ -44,6 +60,7 @@ export interface GenerateCarouselResponse {
     input: number;
     output: number;
   };
+  scientific_references?: ScientificReference[];
 }
 
 // ==========================================

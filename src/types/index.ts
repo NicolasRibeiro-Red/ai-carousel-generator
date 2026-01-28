@@ -18,11 +18,14 @@ export type {
 export type {
   HookTipo,
   HookForca,
+  HookDistribution,
+  HookValidation,
   HookDetailed,
 } from './hook.types';
 
 // API Types
 export type {
+  ScientificReference,
   GenerateHooksRequest,
   GenerateHooksResponse,
   GenerateCarouselRequest,

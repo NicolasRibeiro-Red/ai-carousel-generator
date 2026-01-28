@@ -14,9 +14,21 @@ export type HookTipo =
 
 export type HookForca = 'alta' | 'media-alta' | 'media';
 
+export type HookDistribution = 'proven' | 'adjacent' | 'experimental';
+
+export interface HookValidation {
+  hasCallOut: boolean;
+  hasValuePromise: boolean;
+  wordCount: number;
+  isValid: boolean;
+}
+
 export interface HookDetailed {
   texto: string;
   tipo: HookTipo;
   forca: HookForca;
   componentes: string[];
+  distribution?: HookDistribution;
+  scoreEstimate?: number;
+  validation?: HookValidation;
 }

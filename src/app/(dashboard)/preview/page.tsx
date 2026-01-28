@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCarouselStore } from '@/stores/carousel-store';
 import { SlidePreview } from '@/components/carousel/slide-preview';
+import { ReferencesSection } from '@/components/carousel/references-section';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -284,6 +285,11 @@ export default function PreviewPage() {
           ))}
         </div>
       </div>
+
+      {/* Scientific References */}
+      {carousel.scientific_references && carousel.scientific_references.length > 0 && (
+        <ReferencesSection references={carousel.scientific_references} />
+      )}
 
       {/* Messages */}
       {exportError && (

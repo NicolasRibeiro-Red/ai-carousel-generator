@@ -91,11 +91,13 @@ function parseHooksResponse(content: string): { hooks: string[]; hooksDetailed: 
   // Legacy format: ["hook1", "hook2", ...]
   if (Array.isArray(parsed)) {
     const hooks = parsed as string[];
-    const hooksDetailed = hooks.map((texto, i) => ({
+    const hooksDetailed: HookStructured[] = hooks.map((texto, i) => ({
       texto,
       tipo: 'declaracao' as const,
       forca: i < 2 ? 'alta' as const : 'media' as const,
       componentes: [],
+      distribution: 'proven' as const,
+      scoreEstimate: i < 2 ? 85 : 70,
     }));
     return { hooks, hooksDetailed };
   }

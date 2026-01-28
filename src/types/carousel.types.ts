@@ -2,6 +2,8 @@
 // Carousel Domain Types
 // ==========================================
 
+import type { ScientificReference } from './api.types';
+
 export interface Slide {
   numero: number;
   texto: string;
@@ -27,6 +29,7 @@ export interface Carousel {
   download_count: number;
   created_at: string;
   expires_at: string;
+  scientific_references?: ScientificReference[];
 }
 
 // Twitter-style theme options

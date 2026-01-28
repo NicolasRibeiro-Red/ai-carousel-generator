@@ -21,3 +21,28 @@ export {
   type SaveCarouselParams,
   type SaveCarouselResult,
 } from './carousel.service';
+
+// Topic Detection Service
+export {
+  detectTopics,
+  detectTopicsWithMatches,
+  detectTopicsFromSlides,
+  detectTopicsFromSlidesWithMatches,
+  normalizeText,
+  getTopicLabel,
+  getAllTopics,
+  type BreathworkTopic,
+  type TopicDetectionResult,
+  type SlideInput,
+} from './topic-detection.service';
+
+// References Service
+export {
+  getReferencesForTopics,
+  getReferencesForCarousel,
+  formatReferenceForDisplay,
+  getAllReferences,
+  getReferenceById,
+  detectTopicsFromContent,
+  type ScientificReference,
+} from './references.service';

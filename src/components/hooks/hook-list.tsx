@@ -22,7 +22,7 @@ export function HookList({
   };
 
   return (
-    <div className="space-y-3">
+    <div role="listbox" aria-label="Selecione um hook" className="space-y-3">
       {hooks.map((hook, index) => (
         <HookCard
           key={`${hook}-${index}`}

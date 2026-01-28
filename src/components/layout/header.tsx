@@ -33,7 +33,7 @@ export function Header({ user }: HeaderProps) {
     : 'U';
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:bg-neutral-950/95 dark:supports-[backdrop-filter]:bg-neutral-950/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-surface-overlay backdrop-blur supports-[backdrop-filter]:bg-surface-overlay-blur">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between max-w-4xl">
         {/* Logo */}
         <button
@@ -68,7 +68,7 @@ export function Header({ user }: HeaderProps) {
               Meus Carrosséis
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+            <DropdownMenuItem onClick={handleLogout} className="text-destructive">
               <LogOut className="mr-2 h-4 w-4" />
               Sair
             </DropdownMenuItem>

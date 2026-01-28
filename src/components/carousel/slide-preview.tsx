@@ -160,7 +160,7 @@ export function SlidePreview({
                   {displayName || username}
                 </span>
                 {verified && (
-                  <BadgeCheck className="w-4 h-4 text-[#1D9BF0] flex-shrink-0" />
+                  <BadgeCheck className="w-4 h-4 text-twitter flex-shrink-0" />
                 )}
               </div>
               <span
@@ -182,8 +182,9 @@ export function SlidePreview({
                   onChange={(e) => setEditText(e.target.value)}
                   onBlur={handleSaveEdit}
                   onKeyDown={handleKeyDown}
+                  aria-label="Editar texto do slide"
                   className={cn(
-                    'flex-1 w-full resize-none bg-transparent border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#1D9BF0]',
+                    'flex-1 w-full resize-none bg-transparent border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-twitter',
                     editText.length > 100
                       ? 'text-sm'
                       : editText.length > 60
@@ -214,7 +215,7 @@ export function SlidePreview({
                     </Button>
                     <Button
                       size="sm"
-                      className="h-7 px-2 text-xs bg-[#1D9BF0] hover:bg-[#1A8CD8]"
+                      className="h-7 px-2 text-xs bg-twitter hover:bg-twitter-hover"
                       onClick={handleSaveEdit}
                     >
                       Salvar
@@ -289,10 +290,10 @@ export function SlidePreview({
               key={i}
               className={cn(
                 'h-1 rounded-full transition-all',
-                i + 1 === slide.numero ? 'w-4 bg-[#1D9BF0]' : 'w-1'
+                i + 1 === slide.numero ? 'w-4 bg-twitter' : 'w-1'
               )}
               style={{
-                backgroundColor: i + 1 === slide.numero ? '#1D9BF0' : colors.border,
+                backgroundColor: i + 1 === slide.numero ? 'var(--twitter)' : colors.border,
               }}
             />
           ))}
@@ -312,7 +313,7 @@ export function SlidePreview({
             <Loader2 className="w-4 h-4 animate-spin" />
           ) : downloaded ? (
             <>
-              <Check className="w-4 h-4 mr-1 text-green-500" />
+              <Check className="w-4 h-4 mr-1 text-success" />
               Salvo!
             </>
           ) : (
@@ -330,7 +331,7 @@ export function SlidePreview({
             size="sm"
             onClick={() => onDelete(slide.numero)}
             disabled={isDownloading || isEditing}
-            className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+            className="text-destructive hover:text-destructive hover:bg-error-subtle"
           >
             <Trash2 className="w-4 h-4" />
           </Button>

@@ -210,7 +210,7 @@ export default function PreviewPage() {
                   onCheckedChange={setVerified}
                 />
                 <Label htmlFor="verified" className="flex items-center gap-2 cursor-pointer">
-                  <BadgeCheck className="w-5 h-5 text-[#1D9BF0]" />
+                  <BadgeCheck className="w-5 h-5 text-twitter" />
                   Selo verificado
                 </Label>
               </div>

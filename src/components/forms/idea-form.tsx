@@ -77,7 +77,7 @@ export function IdeaForm({ onSubmit, error }: IdeaFormProps) {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="ideia" className="text-base font-medium">
-                Qual sua ideia? <span className="text-red-500">*</span>
+                Qual sua ideia? <span className="text-destructive">*</span>
               </Label>
               <Button
                 type="button"
@@ -113,36 +113,38 @@ export function IdeaForm({ onSubmit, error }: IdeaFormProps) {
                 onChange={(e) => setFormData({ ideia: e.target.value })}
                 disabled={isGeneratingHooks || isRecording || isTranscribing}
                 className={`min-h-[120px] text-base resize-none ${
-                  isRecording ? 'border-red-500 animate-pulse' : ''
+                  isRecording ? 'border-destructive animate-pulse' : ''
                 }`}
                 maxLength={550}
               />
               {isRecording && (
-                <div className="absolute top-2 right-2 flex items-center gap-2 text-red-500 text-sm">
-                  <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                <div className="absolute top-2 right-2 flex items-center gap-2 text-destructive text-sm">
+                  <span className="w-2 h-2 bg-destructive rounded-full animate-pulse" />
                   Gravando...
                 </div>
               )}
             </div>
             {(audioError || error) && (
-              <div className="p-3 rounded-lg bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-200 text-sm">
+              <div className="p-3 rounded-lg bg-error-subtle text-error-subtle-foreground text-sm">
                 {audioError || error}
               </div>
             )}
             <div className="flex justify-between items-center">
               <span
+                aria-live="polite"
+                aria-atomic="true"
                 className={`text-sm ${
                   isOverLimit
-                    ? 'text-red-500'
+                    ? 'text-destructive'
                     : charCount >= 10
-                    ? 'text-green-600'
+                    ? 'text-success'
                     : 'text-muted-foreground'
                 }`}
               >
                 {charCount}/500 caracteres
               </span>
               {charCount > 0 && charCount < 10 && (
-                <span className="text-sm text-amber-600">
+                <span className="text-sm text-warning">
                   Mínimo 10 caracteres
                 </span>
               )}

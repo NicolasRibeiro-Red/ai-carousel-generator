@@ -21,6 +21,9 @@ export function HookCard({
 }: HookCardProps) {
   return (
     <Card
+      role="option"
+      aria-selected={isSelected}
+      tabIndex={disabled ? -1 : 0}
       className={cn(
         'p-4 cursor-pointer transition-all duration-200',
         'hover:shadow-md hover:-translate-y-0.5',
@@ -30,6 +33,12 @@ export function HookCard({
         disabled && 'opacity-60 cursor-not-allowed hover:translate-y-0 hover:shadow-none'
       )}
       onClick={disabled ? undefined : onSelect}
+      onKeyDown={(e) => {
+        if (!disabled && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault();
+          onSelect();
+        }
+      }}
     >
       <div className="flex items-start gap-4">
         {/* Index/Check */}

@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Sparkles } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { LungIcon } from '@/components/icons/lung-icon';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -49,12 +50,12 @@ export default function LoginPage() {
   };
 
   return (
-    <Card className="shadow-xl border-0">
+    <Card className="shadow-botanical-lg border border-border">
       <CardHeader className="text-center space-y-4">
         <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-          <Sparkles className="w-8 h-8 text-primary" />
+          <LungIcon className="w-8 h-8 text-primary" />
         </div>
-        <CardTitle className="text-2xl font-bold">BreathAI</CardTitle>
+        <CardTitle className="text-2xl font-bold" style={{ fontFamily: 'var(--font-outfit), system-ui, sans-serif' }}>BreathAI</CardTitle>
         <CardDescription className="text-base">
           Transforme suas ideias em carrosseis virais
         </CardDescription>
@@ -90,7 +91,7 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <div className="p-4 rounded-lg text-sm bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-200">
+            <div className="p-4 rounded-lg text-sm bg-error-subtle text-error-subtle-foreground">
               {error}
             </div>
           )}

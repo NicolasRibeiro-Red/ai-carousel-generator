@@ -11,7 +11,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Sparkles, History, LogOut, User as UserIcon } from 'lucide-react';
+import { History, LogOut, User as UserIcon } from 'lucide-react';
+import { LungIcon } from '@/components/icons/lung-icon';
 import type { User } from '@supabase/supabase-js';
 
 interface HeaderProps {
@@ -40,8 +41,8 @@ export function Header({ user }: HeaderProps) {
           onClick={() => router.push('/')}
           className="flex items-center gap-2 font-bold text-xl hover:opacity-80 transition-opacity"
         >
-          <Sparkles className="w-6 h-6 text-primary" />
-          <span>BreathAI</span>
+          <LungIcon className="w-6 h-6 text-primary animate-breathe" />
+          <span style={{ fontFamily: 'var(--font-outfit), system-ui, sans-serif' }}>BreathAI</span>
         </button>
 
         {/* User Menu */}

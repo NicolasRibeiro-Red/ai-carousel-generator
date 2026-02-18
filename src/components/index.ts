@@ -57,6 +57,11 @@ export {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 
+// Generic Molecules (reusable patterns)
+export { SelectableCard } from './ui/selectable-card';
+export { FormCard } from './ui/form-card';
+export { StatusBadge } from './ui/status-badge';
+
 // =============================================================================
 // ORGANISMS - Complex UI sections
 // =============================================================================
@@ -147,6 +152,24 @@ export const COMPONENT_REGISTRY = {
       name: 'DropdownMenu',
       path: '@/components/ui/dropdown-menu',
       a11y: ['keyboard-nav', 'focus-trap', 'aria-expanded'],
+    },
+    SelectableCard: {
+      name: 'SelectableCard',
+      path: '@/components/ui/selectable-card',
+      description: 'Card with selection state, keyboard navigation, and indicator',
+      a11y: ['keyboard-nav', 'aria-selected', 'focus-visible'],
+    },
+    FormCard: {
+      name: 'FormCard',
+      path: '@/components/ui/form-card',
+      description: 'Card wrapper with configurable padding and spacing',
+    },
+    StatusBadge: {
+      name: 'StatusBadge',
+      path: '@/components/ui/status-badge',
+      description: 'Colored badge for status/category indication',
+      variants: ['info', 'warning', 'success', 'error', 'neutral'],
+      sizes: ['sm', 'md'],
     },
   },
   organisms: {

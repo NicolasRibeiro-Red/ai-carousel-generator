@@ -66,3 +66,10 @@ Thumbs.db
 .aios-core/local/
 .claude/settings.local.json
 .aios/install-log.txt
+
+# Storybook
+storybook-static/
+
+# Playwright / Visual regression
+e2e/test-results/
+e2e/__screenshots__/

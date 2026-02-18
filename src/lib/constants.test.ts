@@ -69,7 +69,7 @@ describe('Constants', () => {
     });
 
     it('should have valid word limits', () => {
-      expect(LIMITS.SLIDE_MAX_WORDS).toBeLessThanOrEqual(LIMITS.SLIDE_VALIDATION_MAX_WORDS);
+      expect(LIMITS.SLIDE_MAX_WORDS).toBe(30);
     });
 
     it('should have valid hook limits', () => {
@@ -77,21 +77,19 @@ describe('Constants', () => {
     });
   });
 
-  describe('OPENAI', () => {
+  describe('AI_CONFIG (OPENAI)', () => {
     it('should have default model', () => {
-      expect(OPENAI.DEFAULT_MODEL).toBe('gpt-4o');
+      expect(OPENAI.DEFAULT_MODEL).toBe('claude-sonnet-4-20250514');
     });
 
     it('should have valid token limits', () => {
-      expect(OPENAI.HOOKS_MAX_TOKENS).toBeGreaterThan(0);
+      expect(OPENAI.HOOKS_MAX_TOKENS).toBe(1200);
       expect(OPENAI.CAROUSEL_MAX_TOKENS).toBeGreaterThan(OPENAI.HOOKS_MAX_TOKENS);
     });
 
-    it('should have valid temperature values', () => {
-      expect(OPENAI.HOOKS_TEMPERATURE).toBeGreaterThanOrEqual(0);
-      expect(OPENAI.HOOKS_TEMPERATURE).toBeLessThanOrEqual(2);
-      expect(OPENAI.CAROUSEL_TEMPERATURE).toBeGreaterThanOrEqual(0);
-      expect(OPENAI.CAROUSEL_TEMPERATURE).toBeLessThanOrEqual(2);
+    it('should have correct temperature values', () => {
+      expect(OPENAI.HOOKS_TEMPERATURE).toBe(0.8);
+      expect(OPENAI.CAROUSEL_TEMPERATURE).toBe(0.7);
     });
   });
 

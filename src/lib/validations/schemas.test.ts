@@ -29,6 +29,24 @@ describe('ideaSchema', () => {
       expect(result.error.issues[0].message).toContain('máximo 500');
     }
   });
+
+  it('should reject offensive content', () => {
+    const result = ideaSchema.safeParse('como ser um idiota completo na vida');
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toContain('inadequado');
+    }
+  });
+
+  it('should reject offensive content with accents (bypass attempt)', () => {
+    const result = ideaSchema.safeParse('isso é uma mérdà total');
+    expect(result.success).toBe(false);
+  });
+
+  it('should accept clean content', () => {
+    const result = ideaSchema.safeParse('técnica de respiração para reduzir ansiedade');
+    expect(result.success).toBe(true);
+  });
 });
 
 describe('usernameSchema', () => {
@@ -175,11 +193,20 @@ describe('slideSchema', () => {
     expect(result.success).toBe(true);
   });
 
-  it('should reject slide with too many words (>35)', () => {
-    const longText = Array(40).fill('palavra').join(' ');
+  it('should accept slide with exactly 30 words', () => {
+    const text30 = Array(30).fill('palavra').join(' ');
     const result = slideSchema.safeParse({
       numero: 1,
-      texto: longText,
+      texto: text30,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('should reject slide with 31 words', () => {
+    const text31 = Array(31).fill('palavra').join(' ');
+    const result = slideSchema.safeParse({
+      numero: 1,
+      texto: text31,
     });
     expect(result.success).toBe(false);
   });

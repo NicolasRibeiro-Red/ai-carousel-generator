@@ -79,7 +79,7 @@ export default function HistoryPage() {
 
       {/* Error */}
       {error && (
-        <div className="p-4 rounded-lg bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-200 text-sm">
+        <div className="p-4 rounded-lg bg-error-subtle text-error-subtle-foreground text-sm">
           {error}
         </div>
       )}
@@ -102,7 +102,7 @@ export default function HistoryPage() {
       {!isLoading && carousels.length > 0 && (
         <div className="space-y-4">
           {carousels.map((carousel) => (
-            <Card key={carousel.id} className="hover:shadow-md transition-shadow">
+            <Card key={carousel.id} className="hover-lift">
               <CardContent className="py-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">

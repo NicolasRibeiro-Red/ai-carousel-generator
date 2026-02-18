@@ -293,13 +293,13 @@ export default function PreviewPage() {
 
       {/* Messages */}
       {exportError && (
-        <div className="p-4 rounded-lg bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-200 text-sm">
+        <div className="p-4 rounded-lg bg-error-subtle text-error-subtle-foreground text-sm">
           {exportError}
         </div>
       )}
 
       {exportSuccess && (
-        <div className="p-4 rounded-lg bg-green-50 text-green-800 dark:bg-green-950 dark:text-green-200 text-sm">
+        <div className="p-4 rounded-lg bg-success-subtle text-success-subtle-foreground text-sm">
           {carousel.slides.length} slides baixados com sucesso!
         </div>
       )}

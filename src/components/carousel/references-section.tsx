@@ -2,6 +2,7 @@
 
 import { BookOpen, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { StatusBadge } from '@/components/ui/status-badge';
 import type { ScientificReference } from '@/types';
 
 interface ReferencesSectionProps {
@@ -15,14 +16,14 @@ function formatAuthors(authors: string[]): string {
   return `${authors[0]} et al.`;
 }
 
-function getReliabilityBadge(reliability: ScientificReference['reliability']) {
-  const badges = {
-    'peer-reviewed': { label: 'Revisado por Pares', className: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' },
-    'meta-analysis': { label: 'Meta-analise', className: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' },
-    'systematic-review': { label: 'Revisao Sistematica', className: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' },
-  };
-  return badges[reliability];
-}
+const reliabilityConfig: Record<
+  ScientificReference['reliability'],
+  { label: string; variant: 'info' | 'warning' | 'success' }
+> = {
+  'peer-reviewed': { label: 'Revisado por Pares', variant: 'info' },
+  'meta-analysis': { label: 'Meta-analise', variant: 'warning' },
+  'systematic-review': { label: 'Revisao Sistematica', variant: 'success' },
+};
 
 export function ReferencesSection({ references }: ReferencesSectionProps) {
   if (!references || references.length === 0) {
@@ -42,7 +43,7 @@ export function ReferencesSection({ references }: ReferencesSectionProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         {references.map((ref) => {
-          const badge = getReliabilityBadge(ref.reliability);
+          const config = reliabilityConfig[ref.reliability];
           return (
             <div
               key={ref.id}
@@ -53,9 +54,7 @@ export function ReferencesSection({ references }: ReferencesSectionProps) {
                   <h4 className="font-medium text-sm leading-tight">
                     {ref.title}
                   </h4>
-                  <span className={`px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap ${badge.className}`}>
-                    {badge.label}
-                  </span>
+                  <StatusBadge variant={config.variant} label={config.label} />
                 </div>
 
                 <p className="text-sm text-muted-foreground">

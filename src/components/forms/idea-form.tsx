@@ -20,7 +20,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { Card, CardContent } from '@/components/ui/card';
+import { FormCard } from '@/components/ui/form-card';
 import { Loader2, Sparkles, Settings2, Wand2, Mic, Square } from 'lucide-react';
 
 interface IdeaFormProps {
@@ -71,8 +71,7 @@ export function IdeaForm({ onSubmit, error }: IdeaFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <Card>
-        <CardContent className="pt-6 space-y-6">
+      <FormCard padding="lg" spacing="lg">
           {/* Main Input */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -284,8 +283,7 @@ export function IdeaForm({ onSubmit, error }: IdeaFormProps) {
               </AccordionContent>
             </AccordionItem>
           </Accordion>
-        </CardContent>
-      </Card>
+      </FormCard>
 
       {/* Submit Button */}
       <Button

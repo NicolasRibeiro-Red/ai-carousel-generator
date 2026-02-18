@@ -65,9 +65,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Handle config error
-    if (errorMessage.includes('OPENAI_API_KEY')) {
+    if (errorMessage.includes('ANTHROPIC_API_KEY')) {
       return NextResponse.json(
-        { error: 'Erro de configuração da API OpenAI', code: ERROR_CODES.CONFIG_ERROR, details: errorMessage },
+        { error: 'Erro de configuração da API Anthropic', code: ERROR_CODES.CONFIG_ERROR, details: errorMessage },
         { status: 500 }
       );
     }

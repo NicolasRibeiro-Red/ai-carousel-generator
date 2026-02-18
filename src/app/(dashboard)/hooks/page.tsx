@@ -159,7 +159,7 @@ export default function HooksPage() {
 
       {/* Error Message */}
       {error && (
-        <div className="p-4 rounded-lg bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-200 text-sm">
+        <div className="p-4 rounded-lg bg-error-subtle text-error-subtle-foreground text-sm">
           {error}
         </div>
       )}

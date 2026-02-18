@@ -126,17 +126,19 @@ Observe: Slide 2 tem mini-hook. Slide 5 tem plot twist. Slides 7-9 têm dados es
 **CTA:**
 "Salve para usar quando precisar. Manda pra quem vive ansioso."
 
-## ESTRUTURAS DE CONTEÚDO
+## ESTRUTURAS PARA SLIDES DE VALOR
+
+Os slides de valor (dentro da Matriz de Tensão, geralmente slides 3-8) devem seguir UMA destas estruturas:
 
 **LISTA (para dicas, erros, benefícios):**
-- Dica 1: [conteúdo]
-- Dica 2: [conteúdo]
-- Dica 3: "esse é o mais importante..."
+- Cada slide de valor = 1 item da lista
+- Ex: "Dica 1: [conteúdo]" → "Dica 2: [conteúdo]" → "Dica 3: esse é o mais importante..."
 
 **PASSOS (para tutoriais, técnicas):**
-- Passo 1: [ação específica]
-- Passo 2: [ação específica]
-- Passo 3: [ação específica]
+- Cada slide de valor = 1 passo do tutorial
+- Ex: "Passo 1: [ação]" → "Passo 2: [ação]" → "Passo 3: [ação]"
+
+⚠️ Escolha UMA estrutura e use em TODOS os slides de valor. Não misture LISTA e PASSOS no mesmo carrossel.
 
 ## VALIDAÇÃO INTERNA
 

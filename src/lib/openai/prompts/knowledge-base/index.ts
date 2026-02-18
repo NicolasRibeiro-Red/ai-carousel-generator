@@ -12,8 +12,10 @@ export {
   getHooksBy7020Rule,
   calculateHookScore,
   detectTheme,
+  detectThemeMulti,
   type SwipeFileHook,
   type HookDistribution,
+  type ThemeMultiResult,
 } from './hormozi-hooks';
 
 // Re-export scientific references
@@ -28,21 +30,3 @@ export {
   type ScientificReference,
 } from './scientific-refs';
 
-// ==========================================
-// COMBINED KNOWLEDGE BASE
-// ==========================================
-
-import { IBREATHWORK_KNOWLEDGE_BASE } from './ibreathwork-core';
-import { HORMOZI_METHODOLOGY } from './hormozi-hooks';
-
-/**
- * Combined knowledge base for carousel generation
- * Includes both iBreathwork content and Hormozi methodology
- */
-export const COMBINED_KNOWLEDGE_BASE = `
-${IBREATHWORK_KNOWLEDGE_BASE}
-
----
-
-${HORMOZI_METHODOLOGY}
-`;

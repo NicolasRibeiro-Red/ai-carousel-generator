@@ -37,6 +37,7 @@ export interface HookValidation {
   wordCount: number;
   hasViralComponents: boolean;
   isValid: boolean;
+  scoreDeviation: number;
 }
 
 export interface HookStructured {
@@ -305,7 +306,7 @@ export function validateHooksResponse(response: unknown): boolean {
   if (!response || typeof response !== 'object') return false;
   const obj = response as Record<string, unknown>;
   if (!Array.isArray(obj.hooks)) return false;
-  if (obj.hooks.length !== 5) return false;
+  if (obj.hooks.length < 3 || obj.hooks.length > 5) return false;
 
   return obj.hooks.every((hook: unknown) => {
     if (!hook || typeof hook !== 'object') return false;
@@ -327,25 +328,20 @@ export function validateHook(hook: HookStructured): HookValidation {
   const texto = hook.texto.toLowerCase();
   const wordCount = hook.texto.split(' ').length;
 
-  // Detecta Call Out (pergunta direta, condicional, rótulo)
+  // Detecta Call Out — audiencia especifica, condicional, ou pergunta direta
+  // Não auto-passa por "voce/seu/sua" genérico (quase todo hook teria)
+  const audienceCallOutPattern = /^(se\s|ansiosos?|profissionais|mães|empreendedores|quem\s|pra quem|para quem|insônia|cansado|fadiga|não consegue|quer\s|já\s)/;
   const hasCallOut =
     hook.tipo === 'condicional' ||
     hook.tipo === 'rotulo' ||
     hook.tipo === 'pergunta_sim' ||
-    texto.includes('você') ||
-    texto.includes('seu') ||
-    texto.includes('sua') ||
-    /^se\s/.test(texto);
+    audienceCallOutPattern.test(texto) ||
+    /\?$/.test(hook.texto.trim());
 
-  // Detecta Promessa de Valor (benefício implícito ou explícito)
-  const hasValuePromise =
-    hook.tipo === 'comando' ||
-    hook.tipo === 'declaracao' ||
-    hook.tipo === 'lista' ||
-    /\d+\s?(segundos?|minutos?|passos?|dicas?)/.test(texto) ||
-    texto.includes('como') ||
-    texto.includes('para') ||
-    texto.includes('segredo');
+  // Detecta Promessa de Valor — transformação, números, tensão, erro implícito
+  // Não auto-passa por tipo (evita inflation)
+  const valuePromisePattern = /(\d+\s?(segundos?|minutos?|passos?|dicas?|dias?|horas?|ciclos?|x\b))|segredo|muda[mr]?|transform|funciona|cura|solução|resultado|melhor|errad[oa]|erro|problema|piorar|agora|pare|faça|tente|descubr/i;
+  const hasValuePromise = valuePromisePattern.test(texto);
 
   // Verifica componentes virais
   const hasViralComponents = hook.componentes && hook.componentes.length >= 2;
@@ -360,6 +356,7 @@ export function validateHook(hook: HookStructured): HookValidation {
     wordCount,
     hasViralComponents,
     isValid,
+    scoreDeviation: 0, // populated by enrichHooks
   };
 }
 
@@ -384,13 +381,20 @@ export function recalculateHookScore(hook: HookStructured): number {
 export function enrichHooks(hooks: HookStructured[]): HookStructured[] {
   return hooks.map((hook) => {
     const validation = validateHook(hook);
-    const recalculatedScore = recalculateHookScore(hook);
+    const serverScore = recalculateHookScore(hook);
+    const aiScore = hook.scoreEstimate || 0;
+
+    // Media ponderada: 70% server, 30% AI (evita score inflation)
+    const finalScore = Math.round(serverScore * 0.7 + aiScore * 0.3);
+    const scoreDeviation = Math.abs(serverScore - aiScore);
 
     return {
       ...hook,
-      validation,
-      // Use o maior entre o score estimado pela IA e o recalculado
-      scoreEstimate: Math.max(hook.scoreEstimate || 0, recalculatedScore),
+      validation: {
+        ...validation,
+        scoreDeviation,
+      },
+      scoreEstimate: finalScore,
     };
   });
 }
@@ -410,7 +414,15 @@ export function getHookForca(tipo: HookType): HookForca {
 }
 
 /**
- * Verifica se a distribuição 70-20-10 está correta
+ * Verifica se a distribuição 70-20-10 está correta.
+ *
+ * Para batches de 5 hooks, a regra 70-20-10 arredonda para:
+ * - proven: 4 (ceil(5*0.7)=4, min 3) → ~80%
+ * - adjacent: 1 (floor(5*0.2)=1, min 1) → ~20%
+ * - experimental: 0 (5-4-1=0) → ~0%
+ *
+ * Isso é esperado — em batches pequenos o arredondamento
+ * naturalmente concentra no bucket proven (80-20-0 em vez de 70-20-10).
  */
 export function validate7020Distribution(hooks: HookStructured[]): {
   isValid: boolean;

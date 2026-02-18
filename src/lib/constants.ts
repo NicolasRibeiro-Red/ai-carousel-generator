@@ -43,7 +43,6 @@ export const LIMITS = {
   IDEA_MIN_LENGTH: 10,
   IDEA_MAX_LENGTH: 500,
   SLIDE_MAX_WORDS: 30,
-  SLIDE_VALIDATION_MAX_WORDS: 35,
   MIN_HOOKS: 3,
   MAX_HOOKS: 5,
   MIN_SLIDES: 5,
@@ -54,8 +53,8 @@ export const LIMITS = {
 // AI Model Configuration (Anthropic Claude)
 export const AI_CONFIG = {
   DEFAULT_MODEL: 'claude-sonnet-4-20250514',
-  HOOKS_MAX_TOKENS: 800,
-  HOOKS_TEMPERATURE: 0.9,
+  HOOKS_MAX_TOKENS: 1200,
+  HOOKS_TEMPERATURE: 0.8,
   CAROUSEL_MAX_TOKENS: 3000,
   CAROUSEL_TEMPERATURE: 0.7,
 } as const;

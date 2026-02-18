@@ -1,18 +1,6 @@
 import { z } from 'zod';
-
-// ==========================================
-// VALIDATION SCHEMAS - Zod
-// ==========================================
-
-// Offensive words filter (basic list - expand as needed)
-const offensiveWords: string[] = [
-  // Add offensive words here
-];
-
-function containsOffensiveWords(text: string): boolean {
-  const lowerText = text.toLowerCase();
-  return offensiveWords.some(word => lowerText.includes(word));
-}
+import { containsOffensiveContent } from './offensive-words';
+import { LIMITS } from '@/lib/constants';
 
 // Idea validation schema
 export const ideaSchema = z
@@ -20,7 +8,7 @@ export const ideaSchema = z
   .min(10, 'Descreva sua ideia com mais detalhes (mínimo 10 caracteres)')
   .max(500, 'Simplifique sua ideia (máximo 500 caracteres)')
   .refine(
-    (val) => !containsOffensiveWords(val),
+    (val) => !containsOffensiveContent(val),
     'Conteúdo inadequado detectado. Reformule sua ideia.'
   );
 
@@ -77,7 +65,7 @@ export const generateCarouselSchema = z.object({
 export const slideSchema = z.object({
   numero: z.number(),
   texto: z.string().refine(
-    (val) => val.split(' ').length <= 35, // Allow a bit over 30 for flexibility
+    (val) => val.split(' ').length <= LIMITS.SLIDE_MAX_WORDS,
     'Slide excede o limite de palavras'
   ),
 });

@@ -88,22 +88,6 @@ export const SCIENTIFIC_REFERENCES: ScientificReference[] = [
     reliability: 'peer-reviewed'
   },
   {
-    id: 'chen-2017',
-    title: 'The Effect of Diaphragmatic Breathing on Attention, Negative Affect and Stress in Healthy Adults',
-    authors: ['Chen, Y.F.', 'Huang, X.Y.', 'Chien, C.H.', 'Cheng, J.F.'],
-    journal: 'Frontiers in Psychology',
-    year: 2017,
-    doi: '10.3389/fpsyg.2017.00874',
-    keyFindings: [
-      'Respiração diafragmática melhora atenção sustentada',
-      'Reduz afeto negativo e níveis de cortisol salivar',
-      '8 semanas de prática produz efeitos significativos',
-      'Custo-benefício favorável como intervenção de saúde'
-    ],
-    topics: ['ansiedade', 'foco', 'sistema_nervoso'],
-    reliability: 'peer-reviewed'
-  },
-  {
     id: 'ma-2017',
     title: 'The Effect of Diaphragmatic Breathing on Attention, Negative Affect and Stress in Healthy Adults',
     authors: ['Ma, X.', 'Yue, Z.Q.', 'Gong, Z.Q.', 'et al.'],
@@ -260,7 +244,7 @@ export const SCIENTIFIC_REFERENCES: ScientificReference[] = [
     reliability: 'peer-reviewed'
   },
   {
-    id: 'nestor-2020-study',
+    id: 'bresolin-1983',
     title: 'Mouth breathing and its relationship to some oral and medical conditions',
     authors: ['Bresolin, D.', 'Shapiro, P.A.', 'Shapiro, G.G.', 'et al.'],
     journal: 'Journal of Dentistry for Children',

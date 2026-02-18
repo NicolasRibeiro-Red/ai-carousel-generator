@@ -1239,7 +1239,11 @@ export function getHooksByTheme(tema: string, distribution?: HookDistribution): 
 }
 
 /**
- * Retorna hooks por distribuição respeitando a regra 70-20-10
+ * Retorna hooks por distribuição respeitando a regra 70-20-10.
+ *
+ * Nota: Para total=5, a distribuição arredonda para 4-1-0 (80-20-0)
+ * devido a ceil/floor em batches pequenos. Isso é comportamento esperado
+ * — em batches de 5, o bucket experimental é absorvido pelo proven.
  */
 export function getHooksBy7020Rule(tema: string, total: number = 5): SwipeFileHook[] {
   const themeHooks = HORMOZI_SWIPE_FILE.filter(h => h.tema === tema || h.tema === 'geral');
@@ -1272,13 +1276,13 @@ export function calculateHookScore(hook: {
 }): number {
   let score = 50; // Base score
 
-  // +20: Call Out forte (assume true if tipo is condicional or rotulo)
-  if (hook.hasCallOut || hook.tipo === 'condicional' || hook.tipo === 'rotulo') {
+  // +20: Call Out forte — only when validated, not auto-passed by type
+  if (hook.hasCallOut) {
     score += 20;
   }
 
-  // +20: Promessa de valor (assume based on tipo)
-  if (hook.hasValuePromise || ['comando', 'declaracao', 'lista'].includes(hook.tipo)) {
+  // +20: Promessa de valor — only when validated, not auto-passed by type
+  if (hook.hasValuePromise) {
     score += 20;
   }
 
@@ -1313,29 +1317,56 @@ export function calculateHookScore(hook: {
   return Math.min(100, Math.max(0, score));
 }
 
+// Shared keyword map for theme detection
+const THEME_KEYWORDS: Record<string, string[]> = {
+  ansiedade: ['ansiedade', 'ansioso', 'pânico', 'nervoso', 'preocupação', 'apreensão', 'medo'],
+  sono: ['sono', 'dormir', 'insônia', 'acordar', 'noite', 'descanso', 'cansado', 'fadiga'],
+  energia: ['energia', 'disposição', 'cansaço', 'café', 'acordar', 'manhã', 'produtivo'],
+  sistema_nervoso: ['sistema nervoso', 'nervo vago', 'simpático', 'parassimpático', 'regulação', 'estresse'],
+  ciencia: ['vfc', 'hrv', 'co2', 'oxigênio', 'bohr', 'ondas cerebrais', 'biomarcador'],
+  foco: ['foco', 'concentração', 'produtividade', 'performance', 'atenção', 'meditar', 'trabalho'],
+  respiracao_nasal: ['nariz', 'nasal', 'boca', 'respirar', 'respiração disfuncional'],
+};
+
+export interface ThemeMultiResult {
+  primary: string;
+  secondary: string[];
+  all: string[];
+}
+
 /**
- * Detecta o tema de uma ideia baseado em palavras-chave
+ * Detecta múltiplos temas de uma ideia, retornando primário e secundários.
  */
-export function detectTheme(ideia: string): string {
+export function detectThemeMulti(ideia: string): ThemeMultiResult {
   const ideiaLower = ideia.toLowerCase();
+  const matchedThemes: string[] = [];
 
-  const themeKeywords: Record<string, string[]> = {
-    ansiedade: ['ansiedade', 'ansioso', 'pânico', 'nervoso', 'preocupação', 'apreensão', 'medo'],
-    sono: ['sono', 'dormir', 'insônia', 'acordar', 'noite', 'descanso', 'cansado', 'fadiga'],
-    energia: ['energia', 'disposição', 'cansaço', 'café', 'acordar', 'manhã', 'produtivo'],
-    sistema_nervoso: ['sistema nervoso', 'nervo vago', 'simpático', 'parassimpático', 'regulação', 'estresse'],
-    ciencia: ['vfc', 'hrv', 'co2', 'oxigênio', 'bohr', 'ondas cerebrais', 'biomarcador'],
-    foco: ['foco', 'concentração', 'produtividade', 'performance', 'atenção', 'meditar', 'trabalho'],
-    respiracao_nasal: ['nariz', 'nasal', 'boca', 'respirar', 'respiração disfuncional'],
-  };
-
-  for (const [tema, keywords] of Object.entries(themeKeywords)) {
+  for (const [tema, keywords] of Object.entries(THEME_KEYWORDS)) {
     for (const keyword of keywords) {
       if (ideiaLower.includes(keyword)) {
-        return tema;
+        if (!matchedThemes.includes(tema)) {
+          matchedThemes.push(tema);
+        }
+        break;
       }
     }
   }
 
-  return 'geral';
+  if (matchedThemes.length === 0) {
+    return { primary: 'geral', secondary: [], all: ['geral'] };
+  }
+
+  return {
+    primary: matchedThemes[0],
+    secondary: matchedThemes.slice(1),
+    all: matchedThemes,
+  };
+}
+
+/**
+ * Detecta o tema de uma ideia baseado em palavras-chave.
+ * Backward-compatible wrapper sobre detectThemeMulti.
+ */
+export function detectTheme(ideia: string): string {
+  return detectThemeMulti(ideia).primary;
 }

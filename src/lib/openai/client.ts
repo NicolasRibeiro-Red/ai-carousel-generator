@@ -1,14 +1,14 @@
-import OpenAI from 'openai';
+import Anthropic from '@anthropic-ai/sdk';
 
-// Initialize OpenAI client
-export const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+// Initialize Anthropic client
+export const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
 // Default model - can be overridden by env variable
-export const DEFAULT_MODEL = process.env.OPENAI_MODEL || 'gpt-4o';
+export const DEFAULT_MODEL = process.env.AI_MODEL || 'claude-sonnet-4-20250514';
 
-// Helper to parse JSON from OpenAI response
+// Helper to parse JSON from AI response
 export function parseJsonResponse<T>(content: string): T {
   // Remove markdown code blocks if present
   let cleaned = content.trim();

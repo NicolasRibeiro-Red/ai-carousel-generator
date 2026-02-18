@@ -51,14 +51,17 @@ export const LIMITS = {
   DEFAULT_SLIDES: 10,
 } as const;
 
-// OpenAI Configuration
-export const OPENAI = {
-  DEFAULT_MODEL: 'gpt-4o',
+// AI Model Configuration (Anthropic Claude)
+export const AI_CONFIG = {
+  DEFAULT_MODEL: 'claude-sonnet-4-20250514',
   HOOKS_MAX_TOKENS: 800,
-  HOOKS_TEMPERATURE: 0.8,
-  CAROUSEL_MAX_TOKENS: 2500,
+  HOOKS_TEMPERATURE: 0.9,
+  CAROUSEL_MAX_TOKENS: 3000,
   CAROUSEL_TEMPERATURE: 0.7,
 } as const;
+
+/** @deprecated Use AI_CONFIG instead */
+export const OPENAI = AI_CONFIG;
 
 // Font Size Thresholds for Canvas
 export const FONT_SIZE_THRESHOLDS = [

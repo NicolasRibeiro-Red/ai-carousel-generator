@@ -19,17 +19,75 @@ Criar carrosséis de alta performance que:
 2. RETENHAM atenção até o final (curiosidade progressiva)
 3. RECOMPENSEM com valor real (cumprir e exceder promessa)
 
-## ESTRUTURA OBRIGATÓRIA
+## ESTRUTURA OBRIGATÓRIA — MATRIZ DE TENSÃO NARRATIVA
 
-\`\`\`
+A estrutura abaixo é o segredo de carrosséis que geram SAVES (sinal #1 do algoritmo).
+Cada slide tem uma FUNÇÃO emocional. Não é só informação — é uma jornada.
+
 SLIDE 1: HOOK (fornecido pelo usuário)
-SLIDE 2: Contexto - Por que isso importa agora
-SLIDES 3-N: Conteúdo (LISTA ou PASSOS - escolha UM)
-SLIDE N+1: Resumo - Cumprir a promessa do hook
-SLIDE FINAL: CTA alinhado ao objetivo
-\`\`\`
+→ Função: CHOQUE. Parar o scroll em 3 segundos.
+
+SLIDE 2: MINI-HOOK + CONTEXTO
+→ Instagram RE-MOSTRA o slide 2 para quem não engajou. Precisa de segundo gancho.
+→ NÃO comece com "Vamos entender..." ou "Para começar..."
+→ Ex: "Seu corpo está em modo de emergência agora. E a culpa é dessa coisa que você faz 20.000x por dia."
+
+SLIDES 3-4: CONTEXTO + IDENTIFICAÇÃO
+→ "Isso é sobre MIM". ⚠️ ZONA DE PERIGO: engajamento CAI aqui.
+→ CADA slide DEVE terminar com promessa incompleta ou pergunta implícita.
+
+SLIDE 5 (ou meio): VIRADA (PLOT TWIST)
+→ Insight contraintuitivo. "Mas aqui está o que ninguém te conta:"
+→ Se não surpreende, reescreva.
+
+SLIDES 6-8: VALOR MÁXIMO
+→ Dados, protocolos, frameworks. Densidade máxima.
+→ Cada slide = 1 ponto claro e acionável.
+
+SLIDE PENÚLTIMO: CLÍMAX + PROVA
+→ Resultado concreto, dado científico com fonte, ou antes/depois.
+
+SLIDE FINAL: RECOMPENSA + CTA
+→ Resumo emocional + ação clara alinhada ao objetivo.
+
+### GATILHOS DE SWIPE (OBRIGATÓRIO)
+CADA slide (exceto o último) deve terminar com um gatilho:
+- **Promessa incompleta**: "...mas o mais importante vem agora"
+- **Cliffhanger**: "E foi aí que tudo mudou."
+- **Pergunta implícita**: leitor pensa "como?"
+- **Numeração progressiva**: "Dica 3 de 5 (a próxima é a mais forte)"
+- **Provocação**: "...e o terceiro erro é o que TODO mundo comete"
+- **Loop aberto**: "Mas antes da solução, você precisa saber disso:"
+
+⚠️ REGRA: Slide que termina com ponto final sem gerar curiosidade → REESCREVA.
 
 ${IBREATHWORK_KNOWLEDGE_BASE}
+
+## CHECKLIST DA BASE DE CONHECIMENTO (OBRIGATÓRIO)
+
+✅ Pelo menos 1 protocolo específico com nome e padrão (Ex: "SMART Calm 4-8", "Box Breathing 4-4-4-4")
+✅ Pelo menos 1 dado científico citável (Ex: "6 rpm aumenta VFC em 23% — Russo et al., 2017")
+✅ Contraindicação se técnica intensa (Ex: "Evite se grávida, epilepsia, problemas cardíacos")
+✅ Pelo menos 3 termos técnicos: VFC | Nervo Vago | Parassimpático | Simpático | CO2 | Diafragma | Efeito Bohr | DMN | SNA
+
+## EXEMPLO DE CARROSSEL PERFEITO (10 slides, tema: ansiedade)
+
+Estude a tensão narrativa, os gatilhos de swipe, e a especificidade:
+
+[
+  {"numero": 1, "texto": "Ansiedade? Faça isso AGORA"},
+  {"numero": 2, "texto": "Seu corpo está em modo luta/fuga neste momento. Coração acelerado, respiração curta, mãos frias. E a saída está debaixo do seu nariz..."},
+  {"numero": 3, "texto": "O erro #1: respirar fundo pela boca. Parece certo, mas PIORA a ansiedade. Hiperventilação reduz CO2, e seu cérebro entra em pânico. O segredo é o oposto..."},
+  {"numero": 4, "texto": "Expire. Devagar. Mais devagar que inspirou. Quando expiração > inspiração, o nervo vago ativa o parassimpático. É fisiologia, não filosofia."},
+  {"numero": 5, "texto": "Mas aqui está o que ninguém te conta: a técnica importa MENOS que a consistência. 5 ciclos de 4-8 por dia mudam seu sistema nervoso em 4 semanas."},
+  {"numero": 6, "texto": "Protocolo SMART Calm (4-8): Inspire pelo nariz 4s. Expire pelo nariz 8s. 5-10 ciclos. 3x ao dia."},
+  {"numero": 7, "texto": "Dado: respiração lenta a 6 rpm aumenta VFC em 23% e reduz cortisol (Russo et al., 2017). Seu relógio pode medir isso."},
+  {"numero": 8, "texto": "Protocolo emergência: PARE → pés no chão → EXPIRE todo o ar → 5 ciclos 4-8. Funciona em 60 segundos."},
+  {"numero": 9, "texto": "Resultado: praticantes relatam redução de ansiedade comparável a medicamentos em estudos (Brown & Gerbarg, 2005). Sem efeito colateral."},
+  {"numero": 10, "texto": "Você respira 20.000 vezes por dia. A partir de agora, algumas vão ser conscientes. Salve pra praticar quando precisar."}
+]
+
+Observe: Slide 2 tem mini-hook. Slide 5 tem plot twist. Slides 7-9 têm dados específicos. Cada slide cria tensão para o próximo.
 
 ## REGRAS DE COPYWRITING
 
@@ -84,12 +142,17 @@ ${IBREATHWORK_KNOWLEDGE_BASE}
 
 Antes de responder, verifique:
 - [ ] Slide 1 é exatamente o hook escolhido?
+- [ ] Slide 2 tem mini-hook (não começa com "Vamos...", "Para começar...")?
 - [ ] Todos os slides têm ≤30 palavras?
+- [ ] CADA slide (exceto o último) termina com gatilho de swipe?
+- [ ] Tem VIRADA contraintuitiva no meio do carrossel?
 - [ ] Quantidade de slides correta?
 - [ ] CTA alinhado ao objetivo?
 - [ ] Estrutura é LISTA ou PASSOS (não misturado)?
-- [ ] JSON válido e bem formatado?
-- [ ] Informações técnicas estão corretas conforme a base de conhecimento?`;
+- [ ] JSON válido?
+- [ ] Pelo menos 1 protocolo com nome + padrão?
+- [ ] Pelo menos 1 dado científico citável?
+- [ ] Pelo menos 3 termos técnicos da base de conhecimento?`;
 
 export function buildCarouselUserPrompt(
   hookEscolhido: string,
@@ -165,6 +228,10 @@ Retorne APENAS um array JSON, sem explicações:
 
 REGRAS FINAIS:
 - Slide 1 DEVE ser exatamente o hook escolhido
+- Slide 2 DEVE ter mini-hook (Instagram re-mostra slide 2 para não-engajadores)
 - Cada "texto" deve ter NO MÁXIMO 30 palavras
-- Crie curiosidade entre slides (gatilho de swipe)`;
+- CADA slide DEVE terminar criando TENSÃO para o próximo
+- Meio do carrossel DEVE ter uma VIRADA contraintuitiva
+- Use pelo menos 1 protocolo com nome + 1 dado científico com fonte
+- Saves = sinal #1 do algoritmo. Crie conteúdo que a pessoa PRECISA salvar.`;
 }

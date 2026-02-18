@@ -1,14 +1,15 @@
 // ==========================================
-// OpenAI Service Layer
+// AI Service Layer (Anthropic Claude)
 // ==========================================
 
-import OpenAI from 'openai';
+import Anthropic from '@anthropic-ai/sdk';
 import { parseJsonResponse } from '@/lib/openai/client';
 import { logger } from '@/lib/logger';
-import { OPENAI } from '@/lib/constants';
+import { AI_CONFIG } from '@/lib/constants';
 import {
   HOOKS_SYSTEM_PROMPT,
   buildHooksUserPrompt,
+  enrichHooks,
   type HookStructured,
 } from '@/lib/openai/prompts/hooks';
 import {
@@ -55,19 +56,19 @@ export interface GenerateCarouselResult {
 }
 
 // ==========================================
-// OpenAI Client Factory
+// Anthropic Client Factory
 // ==========================================
 
-function createOpenAIClient(): OpenAI {
-  const apiKey = process.env.OPENAI_API_KEY?.trim();
+function createAnthropicClient(): Anthropic {
+  const apiKey = process.env.ANTHROPIC_API_KEY?.trim();
   if (!apiKey) {
-    throw new Error('OPENAI_API_KEY not configured');
+    throw new Error('ANTHROPIC_API_KEY not configured');
   }
-  return new OpenAI({ apiKey });
+  return new Anthropic({ apiKey });
 }
 
 function getModel(): string {
-  return (process.env.OPENAI_MODEL || OPENAI.DEFAULT_MODEL).trim();
+  return (process.env.AI_MODEL || AI_CONFIG.DEFAULT_MODEL).trim();
 }
 
 // ==========================================
@@ -110,27 +111,28 @@ function parseHooksResponse(content: string): { hooks: string[]; hooksDetailed: 
 // ==========================================
 
 /**
- * Generate hooks using OpenAI
+ * Generate hooks using Anthropic Claude
  */
 export async function generateHooks(params: GenerateHooksParams): Promise<GenerateHooksResult> {
   const { ideia, objetivo, tom } = params;
 
-  const openai = createOpenAIClient();
+  const client = createAnthropicClient();
   const model = getModel();
 
-  const completion = await openai.chat.completions.create({
+  const response = await client.messages.create({
     model,
+    max_tokens: AI_CONFIG.HOOKS_MAX_TOKENS,
+    temperature: AI_CONFIG.HOOKS_TEMPERATURE,
+    system: HOOKS_SYSTEM_PROMPT,
     messages: [
-      { role: 'system', content: HOOKS_SYSTEM_PROMPT },
       { role: 'user', content: buildHooksUserPrompt(ideia, objetivo, tom) },
     ],
-    max_tokens: OPENAI.HOOKS_MAX_TOKENS,
-    temperature: OPENAI.HOOKS_TEMPERATURE,
   });
 
-  const content = completion.choices[0]?.message?.content;
+  const textBlock = response.content.find(block => block.type === 'text');
+  const content = textBlock?.text;
   if (!content) {
-    throw new Error('No content in OpenAI response');
+    throw new Error('No content in AI response');
   }
 
   const { hooks, hooksDetailed } = parseHooksResponse(content);
@@ -139,29 +141,33 @@ export async function generateHooks(params: GenerateHooksParams): Promise<Genera
     throw new Error('Invalid hooks response: less than 3 hooks');
   }
 
+  const enrichedHooks = enrichHooks(hooksDetailed.slice(0, 5));
+
   return {
-    hooks: hooks.slice(0, 5),
-    hooksDetailed: hooksDetailed.slice(0, 5),
+    hooks: enrichedHooks.map(h => h.texto),
+    hooksDetailed: enrichedHooks,
     tokensUsed: {
-      input: completion.usage?.prompt_tokens || 0,
-      output: completion.usage?.completion_tokens || 0,
+      input: response.usage.input_tokens,
+      output: response.usage.output_tokens,
     },
   };
 }
 
 /**
- * Generate carousel slides using OpenAI
+ * Generate carousel slides using Anthropic Claude
  */
 export async function generateCarousel(params: GenerateCarouselParams): Promise<GenerateCarouselResult> {
   const { hookEscolhido, ideiaOriginal, objetivo, tom, emojis, slidesCount, autoSlides } = params;
 
-  const openai = createOpenAIClient();
+  const client = createAnthropicClient();
   const model = getModel();
 
-  const completion = await openai.chat.completions.create({
+  const response = await client.messages.create({
     model,
+    max_tokens: AI_CONFIG.CAROUSEL_MAX_TOKENS,
+    temperature: AI_CONFIG.CAROUSEL_TEMPERATURE,
+    system: CAROUSEL_SYSTEM_PROMPT,
     messages: [
-      { role: 'system', content: CAROUSEL_SYSTEM_PROMPT },
       {
         role: 'user',
         content: buildCarouselUserPrompt(
@@ -175,13 +181,12 @@ export async function generateCarousel(params: GenerateCarouselParams): Promise<
         ),
       },
     ],
-    max_tokens: OPENAI.CAROUSEL_MAX_TOKENS,
-    temperature: OPENAI.CAROUSEL_TEMPERATURE,
   });
 
-  const content = completion.choices[0]?.message?.content;
+  const textBlock = response.content.find(block => block.type === 'text');
+  const content = textBlock?.text;
   if (!content) {
-    throw new Error('No content in OpenAI response');
+    throw new Error('No content in AI response');
   }
 
   let slides: Slide[];
@@ -211,8 +216,8 @@ export async function generateCarousel(params: GenerateCarouselParams): Promise<
   return {
     slides,
     tokensUsed: {
-      input: completion.usage?.prompt_tokens || 0,
-      output: completion.usage?.completion_tokens || 0,
+      input: response.usage.input_tokens,
+      output: response.usage.output_tokens,
     },
   };
 }

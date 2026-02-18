@@ -163,6 +163,36 @@ ${HORMOZI_METHODOLOGY}
 
 ---
 
+## ANTI-PADRÕES (NUNCA FAÇA ISSO)
+
+### Hooks que MATAM o engajamento:
+
+❌ **Hook educativo** (explica o conteúdo em vez de provocar)
+- "A respiração diafragmática ajuda a acalmar" → MORTO. Não tem mistério.
+- "Breathwork é uma técnica de bem-estar" → MORTO. Parece Wikipedia.
+
+❌ **Hook que entrega a resposta** (mata a curiosidade)
+- "Respire 4-8 para acalmar" → MORTO. Já deu o ouro.
+- "Expire mais devagar que inspira para relaxar" → MORTO. Sem motivo pra ler.
+
+❌ **Hook genérico** (sem especificidade)
+- "Dicas de respiração para você" → MORTO. Poderia ser de qualquer conta.
+
+❌ **Hook longo** (>10 palavras perde 50% do impacto)
+
+### O que funciona:
+✅ **TENSÃO** → "Você respira ERRADO a vida toda"
+✅ **CURIOSIDADE** → "O que Navy SEALs sabem que você não sabe"
+✅ **ESPECIFICIDADE** → "3 segundos para acalmar seu sistema nervoso"
+✅ **PROVOCAÇÃO** → "Respirar fundo pode PIORAR sua ansiedade"
+✅ **URGÊNCIA** → "Pare tudo e faça isso AGORA"
+
+### TESTE MENTAL (aplique a cada hook):
+> "Se eu visse isso scrollando no Instagram às 23h, eu PARARIA pra ler?"
+> Se a resposta é "talvez" → reescreva. Só aceite "COM CERTEZA SIM".
+
+---
+
 ${IBREATHWORK_KNOWLEDGE_BASE}`;
 
 // ==========================================
@@ -218,7 +248,11 @@ ${exemplosSwipeFile}
 2. **PARA OBJETIVO "${objetivo}"** → tipos recomendados: ${tiposFormatados}
 3. **USE** a fórmula: CALL OUT + PROMESSA DE VALOR
 4. **INCLUA** pelo menos 2 componentes de manchete viral (recencia, relevancia, celebridade, proximidade, conflito, incomum, em_andamento)
-5. **VARIE** os tamanhos: 1-2 curtos (4-6 palavras), 2-3 médios (7-10), 1 completo (11-15)
+5. **DISTRIBUIÇÃO OBRIGATÓRIA DE TAMANHOS:**
+   - 2 hooks CURTOS (4-6 palavras) → "Ansiedade? Faça isso AGORA" (5 palavras)
+   - 2 hooks MÉDIOS (7-10 palavras) → "A técnica que Navy SEALs usam pra calma" (8 palavras)
+   - 1 hook COMPLETO (11-15 palavras)
+   ⚠️ Hooks curtos (≤8 palavras) PARAM O SCROLL mais rápido. Priorize-os.
 
 ## FORMATO DE RESPOSTA
 
@@ -255,6 +289,7 @@ Calcule o scoreEstimate baseado em:
 - Fale DELES, não de você
 - Português brasileiro natural
 - Mínimo 3 hooks devem ter score ≥ 80
+- Pelo menos 3 hooks devem ter ≤8 palavras
 
 RESPONDA APENAS COM O JSON, sem texto adicional.`;
 }

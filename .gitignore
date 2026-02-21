@@ -61,6 +61,10 @@ logs/
 Thumbs.db
 .idea/
 *.swp
+nul
+
+# MCP Config (local)
+.mcp.json
 
 # AIOS Local (AIOS)
 .aios-core/local/

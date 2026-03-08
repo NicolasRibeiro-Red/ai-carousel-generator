@@ -79,7 +79,7 @@ describe('Constants', () => {
 
   describe('AI_CONFIG (OPENAI)', () => {
     it('should have default model', () => {
-      expect(OPENAI.DEFAULT_MODEL).toBe('claude-sonnet-4-20250514');
+      expect(OPENAI.DEFAULT_MODEL).toBe('claude-sonnet-4-6');
     });
 
     it('should have valid token limits', () => {

@@ -52,7 +52,7 @@ export const LIMITS = {
 
 // AI Model Configuration (Anthropic Claude)
 export const AI_CONFIG = {
-  DEFAULT_MODEL: 'claude-sonnet-4-20250514',
+  DEFAULT_MODEL: 'claude-sonnet-4-6',
   HOOKS_MAX_TOKENS: 1200,
   HOOKS_TEMPERATURE: 0.8,
   CAROUSEL_MAX_TOKENS: 3000,

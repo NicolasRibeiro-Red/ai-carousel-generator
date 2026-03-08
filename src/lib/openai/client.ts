@@ -6,7 +6,7 @@ export const anthropic = new Anthropic({
 });
 
 // Default model - can be overridden by env variable
-export const DEFAULT_MODEL = process.env.AI_MODEL || 'claude-sonnet-4-20250514';
+export const DEFAULT_MODEL = process.env.AI_MODEL || 'claude-sonnet-4-6';
 
 // Helper to parse JSON from AI response
 export function parseJsonResponse<T>(content: string): T {
